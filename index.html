@@ -454,8 +454,7 @@
         #order-placement-section,
         #account-settings-section,
         #retailer-stats-section,
-        #afa-bundle-retailer-section,
-        #marketing-tools-section { /* Added Marketing Tools section here */
+        #afa-bundle-retailer-section {
             background-color: #f9fafb; /* Light background for content sections */
             border: 1px solid #e5e7eb;
             border-radius: 8px;
@@ -784,26 +783,6 @@
                         </h2>
                     </div>
 
-                    <!-- Removed social sign-in buttons -->
-                    <!-- <div class="mt-6">
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <button type="button" id="google-signin-button"
-                                        class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    <i class="fab fa-google mr-2"></i>
-                                    Google
-                                </button>
-                            </div>
-                            <div>
-                                <button type="button" id="apple-signin-button"
-                                        class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    <i class="fab fa-apple mr-2"></i>
-                                    Apple
-                                </button>
-                            </div>
-                        </div>
-                    </div> -->
-
                     <div class="relative my-6">
                         <div class="absolute inset-0 flex items-center">
                             <div class="w-full border-t border-gray-300"></div>
@@ -997,20 +976,17 @@
             </div>
 
             <div id="dashboard-content-area">
-                <div class="dashboard-nav-buttons grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+                <div class="dashboard-nav-buttons grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                     <button id="dashboard-main-btn" class="active">
                         <i class="fas fa-th-large"></i> Dashboard
                     </button>
                     <button id="buy-data-btn">
                         <i class="fas fa-shopping-cart"></i> Buy MTN Data
                     </button>
-                    <button id="afa-bundle-retailer-btn"> <!-- New AFA Bundle Button for Retailer -->
+                    <button id="afa-bundle-retailer-btn">
                         <i class="fas fa-phone-alt"></i> AFA Call Bundle
                     </button>
-                    <button id="marketing-tools-btn"> <!-- New Marketing Tools Button -->
-                        <i class="fas fa-bullhorn"></i> Marketing Tools
-                    </button>
-                    <button id="account-settings-dashboard-btn" class="col-span-2 sm:col-span-1">
+                    <button id="account-settings-dashboard-btn">
                         <i class="fas fa-user-cog"></i> Account Settings
                     </button>
                 </div>
@@ -1108,14 +1084,6 @@
                             </div>
                         </div>
                         
-                        <!-- LLM Feature: Generate AFA Motivation -->
-                        <div class="mt-8 text-center">
-                            <button id="generate-afa-motivation-btn" class="submit-button py-2 px-4 rounded-md text-sm font-medium shadow-md transition-all duration-200 ease-in-out hover:shadow-lg">
-                                ✨ Generate AFA Bundle Tip ✨
-                            </button>
-                            <div id="afa-motivation-output" class="message-box info hidden mt-4"></div>
-                        </div>
-
                         <h3 class="text-xl font-bold mb-2 mt-8 text-center uppercase">REGISTER YOUR NUMBER</h3> <!-- New Header with margin-top and centered -->
                         <form id="afaRegistrationRetailerForm" class="space-y-6">
                             <div>
@@ -1143,27 +1111,6 @@
                             </button>
                         </form>
                         <div id="afa-retailer-message-box" class="message-box info hidden mt-4"></div>
-                    </div>
-                </section>
-
-                <!-- New Marketing Tools Section for Retailer -->
-                <section id="marketing-tools-section" class="hidden">
-                    <div class="p-6 md:p-8">
-                        <h2 class="text-xl font-bold mb-6 text-center">Marketing Tools</h2>
-                        <p class="text-center text-gray-600 mb-6">Generate compelling promotional messages using AI!</p>
-                        
-                        <div class="space-y-4">
-                            <div>
-                                <label for="promo-input" class="block text-sm font-medium text-gray-700 mb-1">What kind of promotion do you need? (e.g., "new customer offer", "big data bundles", "AFA benefits")</label>
-                                <textarea id="promo-input" rows="3" class="input-field block w-full text-sm" placeholder="e.g., A special offer for loyal customers buying 10GB or more."></textarea>
-                            </div>
-                            <div class="text-center">
-                                <button id="generate-promo-btn" class="submit-button py-2 px-4 rounded-md text-sm font-medium shadow-md transition-all duration-200 ease-in-out hover:shadow-lg">
-                                    ✨ Generate Promotion ✨
-                                </button>
-                            </div>
-                            <div id="promo-output" class="message-box info hidden mt-4"></div>
-                        </div>
                     </div>
                 </section>
 
@@ -1327,14 +1274,14 @@
             const dashboardMainBtn = document.getElementById('dashboard-main-btn'); // New button
             const buyDataBtn = document.getElementById('buy-data-btn');
             const afaBundleRetailerBtn = document.getElementById('afa-bundle-retailer-btn'); // New AFA Bundle Button
-            const marketingToolsBtn = document.getElementById('marketing-tools-btn'); // New Marketing Tools Button
+            // Removed marketingToolsBtn
             const accountSettingsDashboardBtn = document.getElementById('account-settings-dashboard-btn'); 
 
             // Retailer Dashboard Sections
             const retailerStatsSection = document.getElementById('retailer-stats-section');
             const orderPlacementSection = document.getElementById('order-placement-section');
             const afaBundleRetailerSection = document.getElementById('afa-bundle-retailer-section'); // New AFA Bundle Section
-            const marketingToolsSection = document.getElementById('marketing-tools-section'); // New Marketing Tools Section
+            // Removed marketingToolsSection
             const accountSettingsSection = document.getElementById('account-settings-section');
 
             // Retailer Dashboard Stat Displays
@@ -1382,13 +1329,6 @@
             // Main FAQ toggle elements
             const mainFaqToggleButton = document.getElementById('main-faq-toggle-button');
             const mainFaqContent = document.getElementById('main-faq-content');
-
-            // LLM Integration elements
-            const generateAfaMotivationBtn = document.getElementById('generate-afa-motivation-btn');
-            const afaMotivationOutput = document.getElementById('afa-motivation-output');
-            const promoInput = document.getElementById('promo-input');
-            const generatePromoBtn = document.getElementById('generate-promo-btn');
-            const promoOutput = document.getElementById('promo-output');
 
 
             let currentView = 'retailer-stats'; // Default view for retailer dashboard
@@ -1496,7 +1436,7 @@
                     signUpForm.classList.add('hidden');
                     forgotPasswordForm.classList.add('hidden');
                     authTitle.textContent = 'Sign In'; 
-                    authSubtitle.innerHTML = 'Not a Member yet? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signin">Sign In</span>'; 
+                    authSubtitle.innerHTML = 'Already a Member? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signin">Sign In</span>'; 
                 } catch (error) {
                     console.error("Sign Up Error:", error);
                     displayMessage(`Sign Up Failed: ${error.message}`, 'error');
@@ -1604,13 +1544,6 @@
                 afaRetailerMessageBox.className = `message-box ${type}`;
                 afaRetailerMessageBox.classList.remove('hidden');
             }
-
-            function displayPromoMessage(message, type) {
-                promoOutput.textContent = message;
-                promoOutput.className = `message-box ${type}`;
-                promoOutput.classList.remove('hidden');
-            }
-
 
             // --- Dynamic Order Form Logic ---
             function addOrderItem() {
@@ -1848,25 +1781,21 @@
             dashboardMainBtn.addEventListener('click', () => switchRetailerDashboardView('retailer-stats'));
             buyDataBtn.addEventListener('click', () => switchRetailerDashboardView('buy-data'));
             afaBundleRetailerBtn.addEventListener('click', () => switchRetailerDashboardView('afa-bundle-retailer')); // New AFA Bundle Button Listener
-            marketingToolsBtn.addEventListener('click', () => switchRetailerDashboardView('marketing-tools')); // New Marketing Tools Button Listener
             accountSettingsDashboardBtn.addEventListener('click', () => switchRetailerDashboardView('account-settings')); 
 
             function switchRetailerDashboardView(view) {
                 retailerStatsSection.classList.add('hidden');
                 orderPlacementSection.classList.add('hidden');
                 afaBundleRetailerSection.classList.add('hidden'); // Hide new AFA section
-                marketingToolsSection.classList.add('hidden'); // Hide new Marketing Tools section
                 accountSettingsSection.classList.add('hidden');
                 accountMessageBox.classList.add('hidden'); 
                 afaRetailerMessageBox.classList.add('hidden'); // Hide AFA message box
-                promoOutput.classList.add('hidden'); // Hide promo message box
 
 
                 // Remove active class from all buttons
                 dashboardMainBtn.classList.remove('active');
                 buyDataBtn.classList.remove('active');
                 afaBundleRetailerBtn.classList.remove('active'); // Remove active from AFA button
-                marketingToolsBtn.classList.remove('active'); // Remove active from Marketing Tools button
                 accountSettingsDashboardBtn.classList.remove('active'); 
 
                 // Close all AFA accordions when switching views
@@ -1892,13 +1821,7 @@
                     afaBundleRetailerBtn.classList.add('active');
                     afaRegistrationRetailerForm.reset(); // Clear form on view switch
                     afaRetailerMessageBox.classList.add('hidden'); // Ensure message box is hidden
-                    afaMotivationOutput.classList.add('hidden'); // Hide motivation output on view switch
-                } else if (view === 'marketing-tools') { // Handle new Marketing Tools view
-                    marketingToolsSection.classList.remove('hidden');
-                    marketingToolsBtn.classList.add('active');
-                    promoInput.value = ''; // Clear input on view switch
-                    promoOutput.classList.add('hidden'); // Hide output on view switch
-                }
+                } 
                 else if (view === 'account-settings') {
                     accountSettingsSection.classList.remove('hidden');
                     accountSettingsDashboardBtn.classList.add('active'); 
@@ -2225,8 +2148,6 @@
                 const isClickInsideMobileMenuButton = mobileMenuButton.contains(event.target);
                 const isClickInsideMobileMenu = mobileMenu.contains(event.target);
                 const isClickInsideAfaSection = afaBundleRetailerSection.contains(event.target);
-                const isClickInsideMarketingSection = marketingToolsSection.contains(event.target) || marketingToolsBtn.contains(event.target);
-
 
                 if (!isClickInsideAgent && agentMessageContainer.classList.contains('show')) {
                     agentMessageContainer.classList.remove('show');
@@ -2238,10 +2159,6 @@
                 // Close AFA accordions if clicking outside the AFA section
                 if (!isClickInsideAfaSection) {
                     closeAllAfaAccordions();
-                }
-                // Hide promo output if clicking outside the Marketing Tools section
-                if (!isClickInsideMarketingSection && promoOutput.classList.contains('info')) {
-                    promoOutput.classList.add('hidden');
                 }
             });
 
@@ -2346,103 +2263,6 @@
                 event.stopPropagation(); // Prevent global click from immediately closing
                 toggleAfaAccordion(afaBenefitsToggle, afaBenefitsContent);
             });
-
-            // --- LLM Integration: Generate AFA Motivation Message ---
-            if (generateAfaMotivationBtn) {
-                generateAfaMotivationBtn.addEventListener('click', async () => {
-                    afaMotivationOutput.classList.remove('hidden', 'success', 'error');
-                    afaMotivationOutput.classList.add('info');
-                    afaMotivationOutput.textContent = 'Generating a personalized tip...';
-
-                    const prompt = `Generate a short, persuasive and benefit-driven marketing message (max 60 words, friendly tone, for mobile users) to encourage people to register for the MTN AFA Bundle. Highlight these key benefits:
-                    - 250 minutes for calls to MTN numbers
-                    - 30 minutes for calls to other networks
-                    - 500 minutes for calls to other registered AFA numbers
-                    - SMS to all networks.
-                    Emphasize value, extensive connectivity, and affordability.`;
-
-                    try {
-                        const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
-                        const apiKey = ""; // Canvas will provide this if empty
-                        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-                        const response = await fetch(apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-
-                        const result = await response.json();
-
-                        if (result.candidates && result.candidates.length > 0 &&
-                            result.candidates[0].content && result.candidates[0].content.parts &&
-                            result.candidates[0].content.parts.length > 0) {
-                            const text = result.candidates[0].content.parts[0].text;
-                            afaMotivationOutput.textContent = text;
-                            afaMotivationOutput.classList.remove('info');
-                            afaMotivationOutput.classList.add('success');
-                        } else {
-                            afaMotivationOutput.textContent = 'Failed to generate tip. Please try again.';
-                            afaMotivationOutput.classList.remove('info');
-                            afaMotivationOutput.classList.add('error');
-                            console.error('Gemini API response structure unexpected:', result);
-                        }
-                    } catch (error) {
-                        afaMotivationOutput.textContent = 'Error generating tip. Please check your network connection.';
-                        afaMotivationOutput.classList.remove('info');
-                        afaMotivationOutput.classList.add('error');
-                        console.error('Error calling Gemini API:', error);
-                    }
-                });
-            }
-
-            // --- LLM Integration: Generate Promotional Message ---
-            if (generatePromoBtn) {
-                generatePromoBtn.addEventListener('click', async () => {
-                    const marketingTopic = promoInput.value.trim();
-                    if (!marketingTopic) {
-                        displayPromoMessage('Please enter a topic for your promotion.', 'error');
-                        return;
-                    }
-
-                    displayPromoMessage('Generating promotional message...', 'info');
-
-                    const prompt = `Generate a compelling and concise marketing message (max 80 words, friendly and enthusiastic tone, suitable for social media or WhatsApp) for a data bundle retailer. The promotion topic is: "${marketingTopic}". Make it attractive to customers and include a call to action to buy data bundles.`;
-
-                    try {
-                        const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
-                        const apiKey = ""; 
-                        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-                        const response = await fetch(apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-
-                        const result = await response.json();
-
-                        if (result.candidates && result.candidates.length > 0 &&
-                            result.candidates[0].content && result.candidates[0].content.parts &&
-                            result.candidates[0].content.parts.length > 0) {
-                            const text = result.candidates[0].content.parts[0].text;
-                            promoOutput.textContent = text;
-                            promoOutput.classList.remove('info');
-                            promoOutput.classList.add('success');
-                        } else {
-                            promoOutput.textContent = 'Failed to generate promotion. Please try again.';
-                            promoOutput.classList.remove('info');
-                            promoOutput.classList.add('error');
-                            console.error('Gemini API response structure unexpected for promotion:', result);
-                        }
-                    } catch (error) {
-                        promoOutput.textContent = 'Error generating promotion. Please check your network connection.';
-                        promoOutput.classList.remove('info');
-                        promoOutput.classList.add('error');
-                        console.error('Error calling Gemini API for promotion:', error);
-                    }
-                });
-            }
         });
     </script>
 </body>
