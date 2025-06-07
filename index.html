@@ -41,7 +41,6 @@
         .main-navbar .slogan-text {
             color: #374151; /* A slightly darker gray for subtlety */
             font-size: 0.6rem; /* Slightly smaller for better fit */
-            font-weight: 500; /* Medium weight */
             margin-top: -0.1rem; /* Pull it slightly closer to the main text */
             white-space: nowrap; /* Prevent wrapping */
         }
@@ -453,9 +452,10 @@
 
         /* Order sections within dashboard (this is the order page itself) */
         #order-placement-section,
-        #my-orders-section,
         #account-settings-section,
-        #retailer-stats-section { /* Applied to account settings too for consistency */
+        #retailer-stats-section,
+        #afa-bundle-retailer-section,
+        #marketing-tools-section { /* Added Marketing Tools section here */
             background-color: #f9fafb; /* Light background for content sections */
             border: 1px solid #e5e7eb;
             border-radius: 8px;
@@ -687,6 +687,55 @@
         #main-faq-content.open {
             max-height: 1000px; /* Large enough to contain all FAQ items */
         }
+
+        /* New Accordion Styles for AFA Bundle Section */
+        .afa-accordion-item {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0.5rem 0;
+        }
+
+        .afa-accordion-item:last-child {
+            border-bottom: none;
+        }
+
+        .afa-accordion-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 0.75rem 0;
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600;
+            color: #1f2937;
+            cursor: pointer;
+            background: none;
+            border: none;
+            text-align: left;
+        }
+
+        .afa-accordion-toggle .icon {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .afa-accordion-toggle.active .icon {
+            transform: rotate(180deg);
+        }
+
+        .afa-accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+            padding: 0 0.75rem; /* Indent the answer */
+            color: #4a5568;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .afa-accordion-content.open {
+            max-height: 500px; /* Adjust as needed to fit content */
+            padding-top: 0.5rem;
+            padding-bottom: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -904,7 +953,7 @@
                     </button>
                     <div class="faq-answer">
                         <p>No, you can only place an order when you are logged into your account.</p>
-                    </div
+                    </div>
                 </div>
 
                 <div class="faq-item">
@@ -954,6 +1003,12 @@
                     </button>
                     <button id="buy-data-btn">
                         <i class="fas fa-shopping-cart"></i> Buy MTN Data
+                    </button>
+                    <button id="afa-bundle-retailer-btn"> <!-- New AFA Bundle Button for Retailer -->
+                        <i class="fas fa-phone-alt"></i> AFA Call Bundle
+                    </button>
+                    <button id="marketing-tools-btn"> <!-- New Marketing Tools Button -->
+                        <i class="fas fa-bullhorn"></i> Marketing Tools
                     </button>
                     <button id="account-settings-dashboard-btn" class="col-span-2 sm:col-span-1">
                         <i class="fas fa-user-cog"></i> Account Settings
@@ -1017,6 +1072,101 @@
                         </form>
                     </div>
                 </section>
+
+                <!-- New AFA Call Bundle Section for Retailer -->
+                <section id="afa-bundle-retailer-section" class="hidden">
+                    <div class="p-6 md:p-8">
+                        <div class="afa-accordion-item">
+                            <button class="afa-accordion-toggle" id="afa-purchase-toggle">
+                                How to Purchase MTN AFA Bundle after Registration
+                                <i class="fas fa-chevron-down icon"></i>
+                            </button>
+                            <div class="afa-accordion-content" id="afa-purchase-content">
+                                <ol class="list-decimal list-inside space-y-1">
+                                    <li>Dial *1848#</li>
+                                    <li>Select option 1 to Buy AFA bundle</li>
+                                    <li>Choose (Monthly no data bundle)</li> <!-- Changed text -->
+                                    <li>Select Option to Confirm</li>
+                                    <li>Enter MoMo PIN and approve payment for the service</li>
+                                    <li>You will receive both SMS notifications from MTN and MoMo.</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <div class="afa-accordion-item mt-4">
+                            <button class="afa-accordion-toggle" id="afa-benefits-toggle">
+                                Benefits of AFA Bundle
+                                <i class="fas fa-chevron-down icon"></i>
+                            </button>
+                            <div class="afa-accordion-content" id="afa-benefits-content">
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li>250 minutes to MTN numbers</li>
+                                    <li>30 minutes to other networks</li>
+                                    <li>500 minutes to other registered AFA numbers</li>
+                                    <li>SMS to all networks</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- LLM Feature: Generate AFA Motivation -->
+                        <div class="mt-8 text-center">
+                            <button id="generate-afa-motivation-btn" class="submit-button py-2 px-4 rounded-md text-sm font-medium shadow-md transition-all duration-200 ease-in-out hover:shadow-lg">
+                                ✨ Generate AFA Bundle Tip ✨
+                            </button>
+                            <div id="afa-motivation-output" class="message-box info hidden mt-4"></div>
+                        </div>
+
+                        <h3 class="text-xl font-bold mb-2 mt-8 text-center uppercase">REGISTER YOUR NUMBER</h3> <!-- New Header with margin-top and centered -->
+                        <form id="afaRegistrationRetailerForm" class="space-y-6">
+                            <div>
+                                <label for="afa-retailer-full-name" class="block text-sm font-medium text-gray-700 mb-1">Full Name<span class="text-red-500">*</span>: </label>
+                                <input type="text" id="afa-retailer-full-name" name="fullName" class="input-field block w-full" placeholder="Evelyn Esi Gyamfi" required>
+                            </div>
+                            <div>
+                                <label for="afa-retailer-ghana-card" class="block text-sm font-medium text-gray-700 mb-1">Ghana Card Number<span class="text-red-500">*</span>: </label>
+                                <input type="text" id="afa-retailer-ghana-card" name="ghanaCard" class="input-field block w-full" placeholder="GHA-000000000-0" required>
+                            </div>
+                            <div>
+                                <label for="afa-retailer-dob" class="block text-sm font-medium text-gray-700 mb-1">Date of Birth<span class="text-red-500">*</span>: </label>
+                                <input type="text" id="afa-retailer-dob" name="dob" class="input-field block w-full" placeholder="e.g., 10th March 1957" required>
+                            </div>
+                            <div>
+                                <label for="afa-retailer-location" class="block text-sm font-medium text-gray-700 mb-1">Location<span class="text-red-500">*</span>: </label>
+                                <input type="text" id="afa-retailer-location" name="location" class="input-field block w-full" placeholder="e.g., Kasoa, Central Region" required>
+                            </div>
+                            <div>
+                                <label for="afa-retailer-occupation" class="block text-sm font-medium text-gray-700 mb-1">Occupation<span class="text-red-500">*</span>: </label>
+                                <input type="text" id="afa-retailer-occupation" name="occupation" class="input-field block w-full" placeholder="e.g., Farmer" required>
+                            </div>
+                            <button type="submit" class="submit-button w-full py-2 px-4 rounded-md text-sm font-medium shadow-md transition-all duration-200 ease-in-out hover:shadow-lg">
+                                Register for AFA Bundle (GHS 10.00)
+                            </button>
+                        </form>
+                        <div id="afa-retailer-message-box" class="message-box info hidden mt-4"></div>
+                    </div>
+                </section>
+
+                <!-- New Marketing Tools Section for Retailer -->
+                <section id="marketing-tools-section" class="hidden">
+                    <div class="p-6 md:p-8">
+                        <h2 class="text-xl font-bold mb-6 text-center">Marketing Tools</h2>
+                        <p class="text-center text-gray-600 mb-6">Generate compelling promotional messages using AI!</p>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label for="promo-input" class="block text-sm font-medium text-gray-700 mb-1">What kind of promotion do you need? (e.g., "new customer offer", "big data bundles", "AFA benefits")</label>
+                                <textarea id="promo-input" rows="3" class="input-field block w-full text-sm" placeholder="e.g., A special offer for loyal customers buying 10GB or more."></textarea>
+                            </div>
+                            <div class="text-center">
+                                <button id="generate-promo-btn" class="submit-button py-2 px-4 rounded-md text-sm font-medium shadow-md transition-all duration-200 ease-in-out hover:shadow-lg">
+                                    ✨ Generate Promotion ✨
+                                </button>
+                            </div>
+                            <div id="promo-output" class="message-box info hidden mt-4"></div>
+                        </div>
+                    </div>
+                </section>
+
 
                 <section id="account-settings-section" class="hidden">
                     <div class="p-6 md:p-8">
@@ -1176,11 +1326,15 @@
             // Retailer Dashboard Navigation Buttons
             const dashboardMainBtn = document.getElementById('dashboard-main-btn'); // New button
             const buyDataBtn = document.getElementById('buy-data-btn');
+            const afaBundleRetailerBtn = document.getElementById('afa-bundle-retailer-btn'); // New AFA Bundle Button
+            const marketingToolsBtn = document.getElementById('marketing-tools-btn'); // New Marketing Tools Button
             const accountSettingsDashboardBtn = document.getElementById('account-settings-dashboard-btn'); 
 
             // Retailer Dashboard Sections
             const retailerStatsSection = document.getElementById('retailer-stats-section');
             const orderPlacementSection = document.getElementById('order-placement-section');
+            const afaBundleRetailerSection = document.getElementById('afa-bundle-retailer-section'); // New AFA Bundle Section
+            const marketingToolsSection = document.getElementById('marketing-tools-section'); // New Marketing Tools Section
             const accountSettingsSection = document.getElementById('account-settings-section');
 
             // Retailer Dashboard Stat Displays
@@ -1202,6 +1356,15 @@
             const confirmNewPasswordInput = document.getElementById('confirm-new-password');
             const accountMessageBox = document.getElementById('account-message-box');
 
+            const afaRegistrationRetailerForm = document.getElementById('afaRegistrationRetailerForm'); // AFA registration form
+            const afaRetailerMessageBox = document.getElementById('afa-retailer-message-box'); // AFA message box
+
+            // AFA Accordion elements
+            const afaPurchaseToggle = document.getElementById('afa-purchase-toggle');
+            const afaPurchaseContent = document.getElementById('afa-purchase-content');
+            const afaBenefitsToggle = document.getElementById('afa-benefits-toggle');
+            const afaBenefitsContent = document.getElementById('afa-benefits-content');
+
 
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
@@ -1219,6 +1382,13 @@
             // Main FAQ toggle elements
             const mainFaqToggleButton = document.getElementById('main-faq-toggle-button');
             const mainFaqContent = document.getElementById('main-faq-content');
+
+            // LLM Integration elements
+            const generateAfaMotivationBtn = document.getElementById('generate-afa-motivation-btn');
+            const afaMotivationOutput = document.getElementById('afa-motivation-output');
+            const promoInput = document.getElementById('promo-input');
+            const generatePromoBtn = document.getElementById('generate-promo-btn');
+            const promoOutput = document.getElementById('promo-output');
 
 
             let currentView = 'retailer-stats'; // Default view for retailer dashboard
@@ -1326,7 +1496,7 @@
                     signUpForm.classList.add('hidden');
                     forgotPasswordForm.classList.add('hidden');
                     authTitle.textContent = 'Sign In'; 
-                    authSubtitle.innerHTML = 'Not a Member yet? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signup">Sign Up</span>'; 
+                    authSubtitle.innerHTML = 'Not a Member yet? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signin">Sign In</span>'; 
                 } catch (error) {
                     console.error("Sign Up Error:", error);
                     displayMessage(`Sign Up Failed: ${error.message}`, 'error');
@@ -1429,6 +1599,18 @@
                 accountMessageBox.classList.remove('hidden');
             }
 
+            function displayAfaRetailerMessage(message, type) {
+                afaRetailerMessageBox.textContent = message;
+                afaRetailerMessageBox.className = `message-box ${type}`;
+                afaRetailerMessageBox.classList.remove('hidden');
+            }
+
+            function displayPromoMessage(message, type) {
+                promoOutput.textContent = message;
+                promoOutput.className = `message-box ${type}`;
+                promoOutput.classList.remove('hidden');
+            }
+
 
             // --- Dynamic Order Form Logic ---
             function addOrderItem() {
@@ -1524,6 +1706,7 @@
                     }
 
                     ordersToProcess.push({
+                        type: 'data', // New property to distinguish order types
                         network: 'MTN', // Assuming MTN for all for now
                         bundleSize: dataSize,
                         bundlePrice: amount,
@@ -1578,9 +1761,48 @@
                         (async () => { // Immediately Invoked Async Function Expression (IIAFE)
                             const paymentReference = response.reference;
                             console.log('Paystack Payment Successful! Reference:', paymentReference);
-                            displayMessage('Payment successful! Logging order details...', 'success');
+                            
+                            // 1. Update local storage with new orders
+                            ordersToProcess.forEach(order => {
+                                const newOrder = {
+                                    id: 'ORD' + Date.now() + '-' + Math.floor(Math.random() * 1000), // More unique ID
+                                    type: 'data', // Explicitly set type
+                                    network: order.network,
+                                    bundle: order.bundleSize,
+                                    price: order.bundlePrice,
+                                    phone: order.recipientPhone,
+                                    paymentReference: paymentReference, // Use the single Paystack reference for all related orders
+                                    date: new Date().toLocaleString(),
+                                    status: 'Submitted' // Changed from 'Processing' to 'Submitted'
+                                };
+                                currentOrders.push(newOrder);
 
-                            // --- Google Apps Script Integration (MOVED HERE) ---
+                                // Update retailer specific stats
+                                if (!retailerClients.has(order.recipientPhone)) {
+                                    retailerClients.add(order.recipientPhone);
+                                }
+                                retailerTotalSales += order.bundlePrice;
+                            });
+                            localStorage.setItem(`userOrders_${currentUserUid}`, JSON.stringify(currentOrders));
+                            localStorage.setItem(`retailerClients_${currentUserUid}`, JSON.stringify(Array.from(retailerClients)));
+                            localStorage.setItem(`retailerTotalSales_${currentUserUid}`, retailerTotalSales.toFixed(2));
+
+
+                            // 2. Switch to Retailer Stats view and automatically show orders
+                            switchRetailerDashboardView('retailer-stats'); 
+                            ordersList.classList.remove('hidden'); // Show orders list
+                            toggleOrdersDisplayButton.textContent = 'Hide Order History'; // Update button text
+                            // 3. Display a success message (this message will appear on the 'My Orders' tab, replacing any previous messages)
+                            displayMessage('Payment successful! Your order has been placed and confirmed.', 'success');
+
+
+                            // 4. Reset order form (can happen in background as user is on 'My Orders')
+                            orderItemsContainer.innerHTML = ''; // Clear all existing items
+                            addOrderItem(); // Add a fresh, empty order item
+                            updateTotalAmount(); // Reset total amount display
+                            
+                            // 5. Send data to Google Apps Script (this can be fire-and-forget or await)
+                            // Keeping it await for robustness, but it won't block the UI switch
                             const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwKwu8XC1awByOIwiTXGGY7iMr1J_vNSrZ1tUv7tPY-Edlzvrs5H1SWyHKIjz86leYi/exec'; // Corrected Apps Script URL
 
                             try {
@@ -1597,51 +1819,20 @@
                                         customerId: currentUserUid,
                                         orders: ordersToProcess.map(order => ({
                                             ...order,
-                                            status: 'Submitted', // Set status to Submitted after successful payment
+                                            status: 'Submitted', // Changed from 'Processing' to 'Submitted'
                                             paymentReference: paymentReference // Add the Paystack reference
                                         }))
                                     })
                                 });
 
                                 console.log('Order details sent to Google Apps Script. Response (if any, will be opaque due to no-cors):', scriptResponse);
-                                displayMessage('Order details successfully logged to spreadsheet.', 'success');
+                                // No need for a second displayMessage here, the first one is the "receipt"
 
                             } catch (error) {
                                 console.error('Error sending order details to Google Apps Script:', error);
-                                displayMessage('Payment successful, but failed to log order details to spreadsheet. Please contact support.', 'error');
+                                // If Apps Script fails, still inform user on the My Orders page
+                                displayMessage('Order logging failed. Please contact support. (Payment was successful)', 'error');
                             }
-
-                            // Update local storage and UI after successful payment and logging attempt
-                            ordersToProcess.forEach(order => {
-                                const newOrder = {
-                                    id: 'ORD' + Date.now() + '-' + Math.floor(Math.random() * 1000), // More unique ID
-                                    network: order.network,
-                                    bundle: order.bundleSize,
-                                    price: order.bundlePrice,
-                                    phone: order.recipientPhone,
-                                    paymentReference: paymentReference, // Use the single Paystack reference for all related orders
-                                    date: new Date().toLocaleString(),
-                                    status: 'Submitted' // Status after successful payment
-                                };
-                                currentOrders.push(newOrder);
-
-                                // Update retailer specific stats
-                                if (!retailerClients.has(order.recipientPhone)) {
-                                    retailerClients.add(order.recipientPhone);
-                                }
-                                retailerTotalSales += order.bundlePrice;
-                            });
-                            localStorage.setItem(`userOrders_${currentUserUid}`, JSON.stringify(currentOrders));
-                            localStorage.setItem(`retailerClients_${currentUserUid}`, JSON.stringify(Array.from(retailerClients)));
-                            localStorage.setItem(`retailerTotalSales_${currentUserUid}`, retailerTotalSales.toFixed(2));
-
-
-                            // Reset form and switch view
-                            orderItemsContainer.innerHTML = ''; // Clear all existing items
-                            addOrderItem(); // Add a fresh, empty order item
-                            updateTotalAmount(); // Reset total amount display
-                            switchRetailerDashboardView('retailer-stats'); // Go back to stats view
-                            updateRetailerStats(); // Update stats
                         })(); // End of IIAFE
                     },
                     onClose: function(){ // Payment modal closed callback
@@ -1656,18 +1847,30 @@
             // Event listener for the new "Dashboard" button
             dashboardMainBtn.addEventListener('click', () => switchRetailerDashboardView('retailer-stats'));
             buyDataBtn.addEventListener('click', () => switchRetailerDashboardView('buy-data'));
+            afaBundleRetailerBtn.addEventListener('click', () => switchRetailerDashboardView('afa-bundle-retailer')); // New AFA Bundle Button Listener
+            marketingToolsBtn.addEventListener('click', () => switchRetailerDashboardView('marketing-tools')); // New Marketing Tools Button Listener
             accountSettingsDashboardBtn.addEventListener('click', () => switchRetailerDashboardView('account-settings')); 
 
             function switchRetailerDashboardView(view) {
                 retailerStatsSection.classList.add('hidden');
                 orderPlacementSection.classList.add('hidden');
+                afaBundleRetailerSection.classList.add('hidden'); // Hide new AFA section
+                marketingToolsSection.classList.add('hidden'); // Hide new Marketing Tools section
                 accountSettingsSection.classList.add('hidden');
                 accountMessageBox.classList.add('hidden'); 
+                afaRetailerMessageBox.classList.add('hidden'); // Hide AFA message box
+                promoOutput.classList.add('hidden'); // Hide promo message box
+
 
                 // Remove active class from all buttons
                 dashboardMainBtn.classList.remove('active');
                 buyDataBtn.classList.remove('active');
+                afaBundleRetailerBtn.classList.remove('active'); // Remove active from AFA button
+                marketingToolsBtn.classList.remove('active'); // Remove active from Marketing Tools button
                 accountSettingsDashboardBtn.classList.remove('active'); 
+
+                // Close all AFA accordions when switching views
+                closeAllAfaAccordions();
 
                 if (view === 'retailer-stats') {
                     retailerStatsSection.classList.remove('hidden');
@@ -1684,13 +1887,138 @@
                     updateTotalAmount();
                     orderDetailsStep.classList.remove('hidden');
                     messageBox.classList.add('hidden');
-                } else if (view === 'account-settings') {
+                } else if (view === 'afa-bundle-retailer') { // Handle new AFA bundle view
+                    afaBundleRetailerSection.classList.remove('hidden');
+                    afaBundleRetailerBtn.classList.add('active');
+                    afaRegistrationRetailerForm.reset(); // Clear form on view switch
+                    afaRetailerMessageBox.classList.add('hidden'); // Ensure message box is hidden
+                    afaMotivationOutput.classList.add('hidden'); // Hide motivation output on view switch
+                } else if (view === 'marketing-tools') { // Handle new Marketing Tools view
+                    marketingToolsSection.classList.remove('hidden');
+                    marketingToolsBtn.classList.add('active');
+                    promoInput.value = ''; // Clear input on view switch
+                    promoOutput.classList.add('hidden'); // Hide output on view switch
+                }
+                else if (view === 'account-settings') {
                     accountSettingsSection.classList.remove('hidden');
                     accountSettingsDashboardBtn.classList.add('active'); 
                     populateAccountSettings();
                 }
                 currentView = view;
             }
+
+            // --- AFA Call Bundle Registration Form Submission (Retailer) ---
+            afaRegistrationRetailerForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                if (!currentUserUid) {
+                    displayAfaRetailerMessage('You must be signed in to register for AFA Bundle.', 'error');
+                    showAuthForms();
+                    return;
+                }
+
+                const fullName = document.getElementById('afa-retailer-full-name').value.trim();
+                const ghanaCard = document.getElementById('afa-retailer-ghana-card').value.trim();
+                const dob = document.getElementById('afa-retailer-dob').value.trim();
+                const location = document.getElementById('afa-retailer-location').value.trim();
+                const occupation = document.getElementById('afa-retailer-occupation').value.trim();
+
+                if (!fullName || !ghanaCard || !dob || !location || !occupation) {
+                    displayAfaRetailerMessage('Please fill in all required fields.', 'error');
+                    return;
+                }
+
+                displayAfaRetailerMessage('Initiating AFA bundle registration payment...', 'info');
+
+                const AFA_BUNDLE_PRICE = 10.00; // Fixed price for AFA bundle, changed to 10.00
+                const handler = PaystackPop.setup({
+                    key: 'pk_live_8e753f43f8defed950965395fc04f5dc7ab1035b', // Your actual public key
+                    email: registeredUserEmail,
+                    amount: AFA_BUNDLE_PRICE * 100, // Amount in kobo/pesewas
+                    currency: 'GHS',
+                    ref: 'AFA_' + Date.now(), // Unique reference for AFA bundle
+                    firstname: registeredUserName.split(' ')[0] || '',
+                    lastname: registeredUserName.split(' ').slice(1).join(' ') || '',
+                    metadata: {
+                        custom_fields: [
+                            { display_name: "Customer ID", variable_name: "customer_id", value: currentUserUid },
+                            { display_name: "Service Type", variable_name: "service_type", value: "AFA Call Bundle" },
+                            { display_name: "Full Name", variable_name: "full_name", value: fullName },
+                            { display_name: "Ghana Card", variable_name: "ghana_card", value: ghanaCard },
+                            { display_name: "Date of Birth", variable_name: "date_of_birth", value: dob },
+                            { display_name: "Location", variable_name: "location", value: location },
+                            { display_name: "Occupation", variable_name: "occupation", value: occupation }
+                        ]
+                    },
+                    callback: function(response) {
+                        (async () => {
+                            const paymentReference = response.reference;
+                            console.log('Paystack Payment Successful for AFA Bundle! Reference:', paymentReference);
+
+                            // 1. Update local storage with new AFA order
+                            const newAfaOrder = {
+                                id: 'AFA' + Date.now() + '-' + Math.floor(Math.random() * 1000), // Unique ID
+                                type: 'afa_bundle', // Explicitly set type for AFA orders
+                                serviceType: 'AFA Call Bundle',
+                                price: AFA_BUNDLE_PRICE,
+                                paymentReference: paymentReference,
+                                date: new Date().toLocaleString(),
+                                status: 'Submitted', // Changed from 'Registered' to 'Submitted'
+                                details: { fullName, ghanaCard, dob, location, occupation }
+                            };
+                            currentOrders.push(newAfaOrder);
+                            localStorage.setItem(`userOrders_${currentUserUid}`, JSON.stringify(currentOrders));
+
+                            // Update retailer specific stats for AFA bundle
+                            if (!retailerClients.has(fullName)) { // Assuming full name as unique identifier for AFA clients
+                                retailerClients.add(fullName);
+                            }
+                            retailerTotalSales += AFA_BUNDLE_PRICE;
+                            localStorage.setItem(`retailerClients_${currentUserUid}`, JSON.stringify(Array.from(retailerClients)));
+                            localStorage.setItem(`retailerTotalSales_${currentUserUid}`, retailerTotalSales.toFixed(2));
+
+
+                            // 2. Switch to Retailer Stats view and automatically show orders
+                            switchRetailerDashboardView('retailer-stats'); 
+                            ordersList.classList.remove('hidden'); // Show orders list
+                            toggleOrdersDisplayButton.textContent = 'Hide Order History'; // Update button text
+                            // 3. Display a success message
+                            displayMessage('AFA Call Bundle registration successful! Your request has been confirmed.', 'success');
+
+
+                            // 4. Reset form (can happen in background as user is on 'My Orders')
+                            afaRegistrationRetailerForm.reset();
+
+                            // 5. Send data to Google Apps Script (same URL, but with different payload structure)
+                            const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwKwu8XC1awByOIwiTXGGY7iMr1J_vNSrZ1tUv7tPY-Edlzvrs5H1SWyHKIjz86leYi/exec';
+
+                            try {
+                                const scriptResponse = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                                    method: 'POST',
+                                    mode: 'no-cors',
+                                    cache: 'no-cache',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        customerName: registeredUserName,
+                                        customerEmail: registeredUserEmail,
+                                        customerId: currentUserUid,
+                                        afaRegistration: newAfaOrder // Send the whole AFA order object
+                                    })
+                                });
+                                console.log('AFA registration details sent to Google Apps Script:', scriptResponse);
+                            } catch (error) {
+                                console.error('Error sending AFA registration details to Google Apps Script:', error);
+                                displayMessage('AFA registration successful, but failed to log details. Please contact support.', 'error');
+                            }
+                        })();
+                    },
+                    onClose: function() {
+                        displayAfaRetailerMessage('AFA Call Bundle registration cancelled.', 'info');
+                    }
+                });
+                handler.openIframe();
+            });
+
 
             // --- Retailer Stats Update Logic ---
             function updateRetailerStats() {
@@ -1730,12 +2058,30 @@
                             statusClass = 'status-unknown';
                         }
 
+                        let orderContent = '';
+                        if (order.type === 'data') {
+                            orderContent = `
+                                <p><strong>Service Type:</strong> Data Bundle</p>
+                                <p><strong>Network:</strong> ${order.network}</p>
+                                <p><strong>Bundle:</strong> ${order.bundle}</p>
+                                <p><strong>Price:</strong> GHS ${order.price.toFixed(2)}</p>
+                                <p><strong>Phone:</strong> ${order.phone}</p>
+                            `;
+                        } else if (order.type === 'afa_bundle' && order.details) {
+                            orderContent = `
+                                <p><strong>Service Type:</strong> AFA Call Bundle</p>
+                                <p><strong>Registration Fee:</strong> GHS ${order.price.toFixed(2)}</p>
+                                <p><strong>Full Name:</strong> ${order.details.fullName}</p>
+                                <p><strong>Ghana Card:</strong> ${order.details.ghanaCard}</p>
+                                <p><strong>Date of Birth:</strong> ${order.details.dob}</p>
+                                <p><strong>Location:</strong> ${order.details.location}</p>
+                                <p><strong>Occupation:</strong> ${order.details.occupation}</p>
+                            `;
+                        }
+
                         orderItem.innerHTML = `
                             <p><strong>Order ID:</strong> ${order.id}</p>
-                            <p><strong>Network:</strong> ${order.network}</p>
-                            <p><strong>Bundle:</strong> ${order.bundle}</p>
-                            <p><strong>Price:</strong> GHS ${order.price.toFixed(2)}</p>
-                            <p><strong>Phone:</strong> ${order.phone}</p>
+                            ${orderContent}
                             <p><strong>Reference:</strong> ${order.paymentReference || 'N/A'}</p>
                             <p><strong>Date:</strong> ${order.date}</p>
                             <p><strong>Status:</strong> <span class="${statusClass}">${displayStatus}</span></p>
@@ -1878,12 +2224,24 @@
                 const isClickInsideAgent = agentMessageContainer.contains(event.target) || mobileAgentLink.contains(event.target);
                 const isClickInsideMobileMenuButton = mobileMenuButton.contains(event.target);
                 const isClickInsideMobileMenu = mobileMenu.contains(event.target);
+                const isClickInsideAfaSection = afaBundleRetailerSection.contains(event.target);
+                const isClickInsideMarketingSection = marketingToolsSection.contains(event.target) || marketingToolsBtn.contains(event.target);
+
 
                 if (!isClickInsideAgent && agentMessageContainer.classList.contains('show')) {
                     agentMessageContainer.classList.remove('show');
                 }
                 if (!isClickInsideMobileMenuButton && !isClickInsideMobileMenu && mobileMenu.classList.contains('open')) {
                     mobileMenu.classList.remove('open');
+                }
+
+                // Close AFA accordions if clicking outside the AFA section
+                if (!isClickInsideAfaSection) {
+                    closeAllAfaAccordions();
+                }
+                // Hide promo output if clicking outside the Marketing Tools section
+                if (!isClickInsideMarketingSection && promoOutput.classList.contains('info')) {
+                    promoOutput.classList.add('hidden');
                 }
             });
 
@@ -1946,6 +2304,145 @@
                     }
                 });
             });
+
+            // --- AFA Accordion Logic ---
+            function toggleAfaAccordion(toggleButton, contentElement) {
+                const isOpen = contentElement.classList.contains('open');
+
+                // Close all other AFA accordions first
+                closeAllAfaAccordions(toggleButton);
+
+                if (!isOpen) {
+                    contentElement.classList.add('open');
+                    toggleButton.classList.add('active');
+                    contentElement.style.maxHeight = contentElement.scrollHeight + "px";
+                } else {
+                    contentElement.classList.remove('open');
+                    toggleButton.classList.remove('active');
+                    contentElement.style.maxHeight = "0";
+                }
+            }
+
+            function closeAllAfaAccordions(excludeButton = null) {
+                const allAfaToggles = document.querySelectorAll('.afa-accordion-toggle');
+                allAfaToggles.forEach(toggle => {
+                    if (toggle !== excludeButton) {
+                        const content = toggle.nextElementSibling;
+                        if (content && content.classList.contains('open')) {
+                            content.classList.remove('open');
+                            toggle.classList.remove('active');
+                            content.style.maxHeight = "0";
+                        }
+                    }
+                });
+            }
+
+            afaPurchaseToggle.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent global click from immediately closing
+                toggleAfaAccordion(afaPurchaseToggle, afaPurchaseContent);
+            });
+
+            afaBenefitsToggle.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent global click from immediately closing
+                toggleAfaAccordion(afaBenefitsToggle, afaBenefitsContent);
+            });
+
+            // --- LLM Integration: Generate AFA Motivation Message ---
+            if (generateAfaMotivationBtn) {
+                generateAfaMotivationBtn.addEventListener('click', async () => {
+                    afaMotivationOutput.classList.remove('hidden', 'success', 'error');
+                    afaMotivationOutput.classList.add('info');
+                    afaMotivationOutput.textContent = 'Generating a personalized tip...';
+
+                    const prompt = `Generate a short, persuasive and benefit-driven marketing message (max 60 words, friendly tone, for mobile users) to encourage people to register for the MTN AFA Bundle. Highlight these key benefits:
+                    - 250 minutes for calls to MTN numbers
+                    - 30 minutes for calls to other networks
+                    - 500 minutes for calls to other registered AFA numbers
+                    - SMS to all networks.
+                    Emphasize value, extensive connectivity, and affordability.`;
+
+                    try {
+                        const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+                        const apiKey = ""; // Canvas will provide this if empty
+                        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        const result = await response.json();
+
+                        if (result.candidates && result.candidates.length > 0 &&
+                            result.candidates[0].content && result.candidates[0].content.parts &&
+                            result.candidates[0].content.parts.length > 0) {
+                            const text = result.candidates[0].content.parts[0].text;
+                            afaMotivationOutput.textContent = text;
+                            afaMotivationOutput.classList.remove('info');
+                            afaMotivationOutput.classList.add('success');
+                        } else {
+                            afaMotivationOutput.textContent = 'Failed to generate tip. Please try again.';
+                            afaMotivationOutput.classList.remove('info');
+                            afaMotivationOutput.classList.add('error');
+                            console.error('Gemini API response structure unexpected:', result);
+                        }
+                    } catch (error) {
+                        afaMotivationOutput.textContent = 'Error generating tip. Please check your network connection.';
+                        afaMotivationOutput.classList.remove('info');
+                        afaMotivationOutput.classList.add('error');
+                        console.error('Error calling Gemini API:', error);
+                    }
+                });
+            }
+
+            // --- LLM Integration: Generate Promotional Message ---
+            if (generatePromoBtn) {
+                generatePromoBtn.addEventListener('click', async () => {
+                    const marketingTopic = promoInput.value.trim();
+                    if (!marketingTopic) {
+                        displayPromoMessage('Please enter a topic for your promotion.', 'error');
+                        return;
+                    }
+
+                    displayPromoMessage('Generating promotional message...', 'info');
+
+                    const prompt = `Generate a compelling and concise marketing message (max 80 words, friendly and enthusiastic tone, suitable for social media or WhatsApp) for a data bundle retailer. The promotion topic is: "${marketingTopic}". Make it attractive to customers and include a call to action to buy data bundles.`;
+
+                    try {
+                        const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+                        const apiKey = ""; 
+                        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        const result = await response.json();
+
+                        if (result.candidates && result.candidates.length > 0 &&
+                            result.candidates[0].content && result.candidates[0].content.parts &&
+                            result.candidates[0].content.parts.length > 0) {
+                            const text = result.candidates[0].content.parts[0].text;
+                            promoOutput.textContent = text;
+                            promoOutput.classList.remove('info');
+                            promoOutput.classList.add('success');
+                        } else {
+                            promoOutput.textContent = 'Failed to generate promotion. Please try again.';
+                            promoOutput.classList.remove('info');
+                            promoOutput.classList.add('error');
+                            console.error('Gemini API response structure unexpected for promotion:', result);
+                        }
+                    } catch (error) {
+                        promoOutput.textContent = 'Error generating promotion. Please check your network connection.';
+                        promoOutput.classList.remove('info');
+                        promoOutput.classList.add('error');
+                        console.error('Error calling Gemini API for promotion:', error);
+                    }
+                });
+            }
         });
     </script>
 </body>
