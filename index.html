@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BD NETWORK SOLUTIONS - Retailer Dashboard</title>
+    <title>BD TECH SOLUTIONS - Retailer Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <!-- Paystack Checkout SDK -->
@@ -244,7 +244,8 @@
         }
 
         /* Adjust specific text/elements inside the card */
-        #auth-title, #main-app-section h2, #retailer-dashboard-content h2, #order-details-step h3 {
+        #auth-title, #main-app-section h2, #retailer-dashboard-content h2,
+        #mtn-order-details-step h3, #at-order-details-step h3, #telecel-order-details-step h3 { /* Added new sections */
             color: #1f2937; /* Headings to dark */
             text-shadow: none;
         }
@@ -304,15 +305,23 @@
         .dashboard-nav-buttons button {
             background-color: #FFD700;
             color: #1f2937;
-            padding: 0.75rem 1.2rem; /* Slightly reduced padding */
+            padding: 0.4rem 0.6rem; /* Further reduced padding */
             border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.875rem; /* text-sm for compactness */
+            font-weight: 600;
+            font-size: 0.8rem; /* Further reduced font size for text */
             transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             display: flex; /* Make buttons flexible for icons */
+            flex-direction: column; /* Stack icon and text vertically */
             align-items: center;
-            gap: 0.5rem;
+            justify-content: center; /* Center content vertically within button */
+            gap: 0.05rem; /* Further reduced gap */
+            text-align: center; /* Center the text below the icon */
+            min-height: 70px; /* Slightly smaller min height */
+        }
+        .dashboard-nav-buttons button i {
+            font-size: 1.1rem; /* Further adjusted icon size */
+            margin-bottom: 0.05rem; /* Very small space below icon */
         }
         .dashboard-nav-buttons button:hover {
             background-color: #FFC000;
@@ -322,6 +331,12 @@
             background-color: #1f2937; /* Dark background for active button */
             color: #FFD700; /* Yellow text for active button */
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3); /* Inset shadow for pressed look */
+        }
+        /* Adjust grid for 6 columns on larger screens (for retailer) */
+        @media (min-width: 768px) {
+            .dashboard-nav-buttons {
+                grid-template-columns: repeat(4, minmax(0, 1fr)); /* Adjusted to 4 columns for retailer */
+            }
         }
 
         /* Styling for individual order items */
@@ -451,10 +466,12 @@
         }
 
         /* Order sections within dashboard (this is the order page itself) */
-        #order-placement-section,
-        #account-settings-section,
+        #mtn-order-placement-section,
+        #at-order-placement-section,
+        #telecel-order-placement-section,
         #retailer-stats-section,
-        #afa-bundle-retailer-section {
+        #afa-bundle-retailer-section,
+        #account-settings-section {
             background-color: #f9fafb; /* Light background for content sections */
             border: 1px solid #e5e7eb;
             border-radius: 8px;
@@ -742,10 +759,10 @@
         <div class="container mx-auto flex items-center justify-between relative">
             <div class="flex items-center">
                 <a href="https://i.imgur.com/Sede46z.jpeg" target="_blank" class="flex items-center">
-                    <img src="https://i.imgur.com/Sede46z.jpeg" alt="BD NETWORK SOLUTIONS Logo" class="h-12 w-auto mr-3 rounded-full">
+                    <img src="https://i.imgur.com/Sede46z.jpeg" alt="BD TECH SOLUTIONS Logo" class="h-12 w-auto mr-3 rounded-full">
                 </a>
                 <div class="flex flex-col items-start ml-3">
-                    <span class="logo-text">BD NETWORK SOLUTIONS</span>
+                    <span class="logo-text">BD TECH SOLUTIONS</span>
                     <span class="slogan-text">YOUR LINK TO THE DIGITAL WORLD</span>
                 </div>
             </div>
@@ -756,14 +773,19 @@
             </button>
             <!-- Mobile menu now inside this container -->
             <div id="mobile-menu" class="hidden">
-                <a href="#" id="mobile-agent-link">Become an Agent</a>
-                <a href="https://wa.me/233531323296" target="_blank" id="mobile-contact-link">Contact Support</a>
+                <a href="#" id="mobile-dashboard-link">Dashboard</a>
+                <a href="#" id="mobile-mtn-data-link">MTN DATA</a>
+                <a href="#" id="mobile-at-data-link">AT DATA</a>
+                <a href="#" id="mobile-telecel-data-link">TELECEL DATA</a>
+                <a href="#" id="mobile-afa-bundle-retailer-link">AFA Call Bundle</a>
+                <a href="#" id="mobile-account-settings-link">Account Settings</a>
+                <a href="#" id="mobile-contact-link">Contact Support</a>
                 <a href="https://chat.whatsapp.com/JZhLLboZmW9FjxcimGtZuX" target="_blank">Join our community</a>
             </div>
         </div>
     </nav>
 
-    <!-- Removed contact-name-container as it's no longer needed -->
+    <!-- Agent Message Display styling -->
     <div id="agent-message-container">
         <span>Please reach out to <a href="mailto:bdnetworksolutions01@gmail.com" class="font-bold underline text-blue-800 hover:text-blue-600">bdnetworksolutions01@gmail.com</a> via Gmail.</span>
     </div>
@@ -773,13 +795,13 @@
             <div class="hero-overlay"></div>
             <div class="hero-content-wrapper container mx-auto flex flex-col md:flex-row items-center md:items-start justify-center gap-8 px-4 sm:px-6 lg:px-8">
                 <div class="hero-text-content md:w-1/2 lg:w-2/5 text-center md:text-left mb-8 md:mb-0">
-                    <h1 class="text-white">Enjoy Affordable and Non-Expiry Data Bundle Offers</h1>
-                    <p class="text-white">Experience seamless connectivity with our flexible data plans.</p>
+                    <h1 class="text-white">Empower Your Sales: Manage Data & AFA Bundles Seamlessly</h1>
+                    <p class="text-white">As a BD TECH SOLUTIONS retailer, effortlessly buy and sell data bundles and AFA Call Bundles to your clients.</p>
                 </div>
                 <div class="max-w-md w-full md:w-1/2 lg:w-2/5 card" id="auth-section">
                     <div>
                         <h2 class="mt-6 text-center text-3xl font-extrabold" id="auth-title">
-                            Sign In
+                            Retailer Sign In
                         </h2>
                     </div>
 
@@ -833,7 +855,7 @@
                     </form>
 
                     <p class="mt-4 text-center text-sm" id="auth-subtitle">
-                        Not a Member yet? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signup">Sign Up</span>
+                        Not a Retailer yet? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signup">Register Here</span>
                     </p>
 
                     <form class="space-y-4 md:space-y-6 hidden" id="signUpForm">
@@ -870,7 +892,7 @@
                         <div class="mt-6">
                             <button type="submit"
                                     class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md submit-button">
-                                Sign Up
+                                Register
                             </button>
                         </div>
                     </form>
@@ -911,57 +933,47 @@
         <!-- Frequently Asked Questions Section -->
         <section class="faq-section">
             <button id="main-faq-toggle-button">
-                <span>Frequently Asked Questions (FAQ)</span>
+                <span>Frequently Asked Questions (FAQ) - Retailers</span>
                 <i class="fas fa-chevron-down icon"></i>
             </button>
             <div id="main-faq-content">
                 <div class="faq-item">
                     <button class="faq-question">
-                        Where do I find my order after placing one?
+                        How do I track my sales and client numbers?
                         <i class="fas fa-chevron-down icon"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>Simply click on the "My Orders" tab in your account, then click "Show Orders" to view all your past and current orders.</p>
+                        <p>Your dashboard provides real-time statistics on total orders, total clients, and total sales. Simply navigate to the 'Dashboard' tab.</p>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <button class="faq-question">
-                        Can I place an order if I'm not signed in?
+                        Can I place orders for different networks?
                         <i class="fas fa-chevron-down icon"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>No, you can only place an order when you are logged into your account.</p>
+                        <p>Yes, you can now purchase bundles for MTN, AirtelTigo, and Telecel networks from the 'Buy Data' section.</p>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <button class="faq-question">
-                        Can I place an order for friends and family?
+                        What are the benefits of selling AFA Call Bundles?
                         <i class="fas fa-chevron-down icon"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>Yes. There's an option to "Add Another Order" which allows you to place multiple orders at once for different numbers.</p>
+                        <p>AFA Call Bundles offer attractive commissions and expand your product offerings. Details on purchasing and benefits are available in the 'AFA Call Bundle' section.</p>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <button class="faq-question">
-                        Can I share the website link with my friends and family?
+                        What times can I process orders?
                         <i class="fas fa-chevron-down icon"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>Yes, please do. They can create an account and place orders themselves too.</p>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <button class="faq-question">
-                        What times can I place orders?
-                        <i class="fas fa-chevron-down icon"></i>
-                    </button>
-                    <div class="faq-answer">
-                        <p>You can place orders at any time. Our active working hours are 8 AM to 8 PM, Monday to Saturday. If you place an order outside these hours, your data will still be delivered in due time. Thank you</p>
+                        <p>You can process orders at any time. Our active working hours are 8 AM to 8 PM, Monday to Saturday. Orders placed outside these hours will still be delivered in due time. Thank you</p>
                     </div>
                 </div>
             </div>
@@ -976,67 +988,76 @@
             </div>
 
             <div id="dashboard-content-area">
-                <div class="dashboard-nav-buttons grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="dashboard-nav-buttons grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
                     <button id="dashboard-main-btn" class="active">
-                        <i class="fas fa-th-large"></i> Dashboard
+                        <i class="fas fa-th-large"></i> <span>Dashboard</span>
                     </button>
-                    <button id="buy-data-btn">
-                        <i class="fas fa-shopping-cart"></i> Buy MTN Data
+                    <button id="mtn-order-placement-btn">
+                        <i class="fas fa-wifi"></i> <span>MTN DATA</span>
+                    </button>
+                    <button id="at-order-placement-btn">
+                        <i class="fas fa-broadcast-tower"></i> <span>AT DATA</span>
+                    </button>
+                    <button id="telecel-order-placement-btn">
+                        <i class="fas fa-mobile-alt"></i> <span>TELECEL DATA</span>
                     </button>
                     <button id="afa-bundle-retailer-btn">
-                        <i class="fas fa-phone-alt"></i> AFA Call Bundle
+                        <i class="fas fa-phone-alt"></i> <span>AFA Call Bundle</span>
                     </button>
-                    <button id="account-settings-dashboard-btn">
-                        <i class="fas fa-user-cog"></i> Account Settings
+                    <button id="account-settings-btn">
+                        <i class="fas fa-user-cog"></i> <span>Account</span>
                     </button>
                 </div>
 
                 <!-- Section for displaying Retailer Statistics (now the main Dashboard view) -->
                 <section id="retailer-stats-section">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <div class="stat-card">
-                            <p class="stat-label">Total Orders</p>
-                            <p class="stat-value" id="total-orders">0</p>
+                    <div class="p-6 md:p-8">
+                        <h2 class="text-2xl font-bold mb-6 text-center">Retailer Dashboard Overview</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="stat-card">
+                                <p class="stat-label">Total Orders</p>
+                                <p class="stat-value" id="total-orders">0</p>
+                            </div>
+                            <div class="stat-card">
+                                <p class="stat-label">Total Clients</p>
+                                <p class="stat-value text-blue-600" id="total-clients">0</p>
+                            </div>
+                            <div class="stat-card">
+                                <p class="stat-label">Total Sales</p>
+                                <p class="stat-value text-green-600" id="total-sales">GHS 0.00</p>
+                            </div>
                         </div>
-                        <div class="stat-card">
-                            <p class="stat-label">Total Clients</p>
-                            <p class="stat-value text-blue-600" id="total-clients">0</p>
-                        </div>
-                        <div class="stat-card">
-                            <p class="stat-label">Total Sales</p>
-                            <p class="stat-value text-green-600" id="total-sales">GHS 0.00</p>
-                        </div>
-                    </div>
-                    
-                    <button id="toggle-orders-display" class="submit-button mt-4 w-full py-2 px-4 rounded-md text-sm font-medium shadow-md transition-all duration-200 ease-in-out hover:shadow-lg">
-                        Order History
-                    </button>
 
-                    <div id="orders-list" class="space-y-4 mt-6 hidden"> <p class="text-gray-600 text-center" id="no-orders-message">No orders placed yet.</p>
+                        <button id="toggle-orders-display" class="submit-button mt-4 w-full py-2 px-4 rounded-md text-sm font-medium shadow-md transition-all duration-200 ease-in-out hover:shadow-lg">
+                            Order History
+                        </button>
+
+                        <div id="orders-list" class="space-y-4 mt-6 hidden"> <p class="text-gray-600 text-center" id="no-orders-message">No orders placed yet.</p>
+                        </div>
                     </div>
                 </section>
 
-                <!-- Order Placement Section - Hidden by default -->
-                <section id="order-placement-section" class="hidden">
-                    <div id="order-details-step" class="p-6 md:p-8">
-                        <h3 class="mt-6 text-center text-xl font-extrabold text-yellow-400 mb-6">
+                <!-- MTN Data Order Section (Now uses dynamic item adding) -->
+                <section id="mtn-order-placement-section" class="hidden">
+                    <div id="mtn-order-details-step" class="p-6 md:p-8">
+                        <h3 class="mt-6 text-center text-2xl font-extrabold text-black mb-6">
                             MTNUP2U DATA BUNDLE
                         </h3>
                         <p class="mt-2 text-center text-sm text-gray-600">
-                            Fill in your details to place your order.
+                            Fill in client details to place MTN data order.
                         </p>
-                        <form class="mt-8 space-y-4" id="orderForm">
+                        <form class="mt-8 space-y-6" id="mtnOrderForm">
                             <!-- Container for multiple order items -->
-                            <div id="order-items-container">
+                            <div id="mtn-order-items-container">
                                 <!-- Initial order item will be added by JavaScript -->
                             </div>
 
-                            <button type="button" id="add-another-order-btn" class="submit-button w-full py-2 px-4 rounded-md text-sm font-medium shadow-md transition-all duration-200 ease-in-out hover:shadow-lg mt-4">
-                                Add Another Order
+                            <button type="button" id="add-another-mtn-order-btn" class="submit-button w-full py-2 px-4 rounded-md text-sm font-medium shadow-md transition-all duration-200 ease-in-out hover:shadow-lg mt-4">
+                                Add Another MTN Order
                             </button>
 
                             <div class="mt-6 text-right">
-                                <p class="text-lg font-bold">Total Amount: <span id="total-order-amount">GHS 0.00</span></p>
+                                <p class="text-lg font-bold">Total Amount: <span id="mtn-total-order-amount">GHS 0.00</span></p>
                             </div>
 
                             <div>
@@ -1049,29 +1070,96 @@
                     </div>
                 </section>
 
+                <!-- AirtelTigo Data Order Section -->
+                <section id="at-order-placement-section" class="hidden">
+                    <div id="at-order-details-step" class="p-6 md:p-8">
+                        <h3 class="mt-6 text-center text-2xl font-extrabold text-black mb-6">
+                            AIRTEL TIGO DATA BUNDLE
+                        </h3>
+                        <p class="mt-2 text-center text-sm text-gray-600">
+                            Fill in client details to place AirtelTigo data order.
+                        </p>
+                        <form class="mt-8 space-y-6" id="atOrderForm">
+                            <!-- Container for multiple order items -->
+                            <div id="at-order-items-container">
+                                <!-- Initial order item will be added by JavaScript -->
+                            </div>
+
+                            <button type="button" id="add-another-at-order-btn" class="submit-button w-full py-2 px-4 rounded-md text-sm font-medium shadow-md transition-all duration-200 ease-in-out hover:shadow-lg mt-4">
+                                Add Another AT Order
+                            </button>
+
+                            <div class="mt-6 text-right">
+                                <p class="text-lg font-bold">Total Amount: <span id="at-total-order-amount">GHS 0.00</span></p>
+                            </div>
+
+                            <div>
+                                <button type="submit"
+                                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md submit-button">
+                                    Proceed to Payment
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Telecel Data Order Section -->
+                <section id="telecel-order-placement-section" class="hidden">
+                    <div id="telecel-order-details-step" class="p-6 md:p-8">
+                        <h3 class="mt-6 text-center text-2xl font-extrabold text-black mb-6">
+                            TELECEL DATA BUNDLE
+                        </h3>
+                        <p class="mt-2 text-center text-sm text-gray-600">
+                            Fill in client details to place Telecel data order.
+                        </p>
+                        <form class="mt-8 space-y-6" id="telecelOrderForm">
+                            <!-- Container for multiple order items -->
+                            <div id="telecel-order-items-container">
+                                <!-- Initial order item will be added by JavaScript -->
+                            </div>
+
+                            <button type="button" id="add-another-telecel-order-btn" class="submit-button w-full py-2 px-4 rounded-md text-sm font-medium shadow-md transition-all duration-200 ease-in-out hover:shadow-lg mt-4">
+                                Add Another Telecel Order
+                            </button>
+
+                            <div class="mt-6 text-right">
+                                <p class="text-lg font-bold">Total Amount: <span id="telecel-total-order-amount">GHS 0.00</span></p>
+                            </div>
+
+                            <div>
+                                <button type="submit"
+                                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md submit-button">
+                                    Proceed to Payment
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+
                 <!-- New AFA Call Bundle Section for Retailer -->
                 <section id="afa-bundle-retailer-section" class="hidden">
                     <div class="p-6 md:p-8">
                         <div class="afa-accordion-item">
                             <button class="afa-accordion-toggle" id="afa-purchase-toggle">
-                                How to Purchase MTN AFA Bundle after Registration
+                                How to Purchase MTN AFA Bundle for your Client after Registration
                                 <i class="fas fa-chevron-down icon"></i>
                             </button>
                             <div class="afa-accordion-content" id="afa-purchase-content">
                                 <ol class="list-decimal list-inside space-y-1">
-                                    <li>Dial *1848#</li>
-                                    <li>Select option 1 to Buy AFA bundle</li>
-                                    <li>Choose (Monthly no data bundle)</li> <!-- Changed text -->
-                                    <li>Select Option to Confirm</li>
-                                    <li>Enter MoMo PIN and approve payment for the service</li>
-                                    <li>You will receive both SMS notifications from MTN and MoMo.</li>
+                                    <li>Instruct your client to dial *1848#</li>
+                                    <li>Client selects option 1 to Buy AFA bundle</li>
+                                    <li>Client chooses (Monthly no data bundle)</li>
+                                    <li>Client selects option to Confirm</li>
+                                    <li>Client enters MoMo PIN and approves payment for the service</li>
+                                    <li>Client will receive both SMS notifications from MTN and MoMo.</li>
                                 </ol>
                             </div>
                         </div>
 
                         <div class="afa-accordion-item mt-4">
                             <button class="afa-accordion-toggle" id="afa-benefits-toggle">
-                                Benefits of AFA Bundle
+                                Benefits of AFA Bundle for your Clients
                                 <i class="fas fa-chevron-down icon"></i>
                             </button>
                             <div class="afa-accordion-content" id="afa-benefits-content">
@@ -1084,35 +1172,35 @@
                             </div>
                         </div>
                         
-                        <h3 class="text-xl font-bold mb-2 mt-8 text-center uppercase">REGISTER YOUR NUMBER</h3> <!-- New Header with margin-top and centered -->
+                        <h3 class="text-xl font-bold mb-2 mt-8 text-center uppercase">REGISTER CLIENT'S NUMBER</h3>
                         <form id="afaRegistrationRetailerForm" class="space-y-6">
                             <div>
-                                <label for="afa-retailer-full-name" class="block text-sm font-medium text-gray-700 mb-1">Full Name<span class="text-red-500">*</span>: </label>
+                                <label for="afa-retailer-full-name" class="block text-sm font-medium text-gray-700 mb-1">Client Full Name<span class="text-red-500">*</span>: </label>
                                 <input type="text" id="afa-retailer-full-name" name="fullName" class="input-field block w-full" placeholder="Evelyn Esi Gyamfi" required>
                             </div>
-                            <!-- New Phone Number Field for Retailer -->
                             <div>
-                                <label for="afa-retailer-phone-number" class="block text-sm font-medium text-gray-700 mb-1">Phone Number<span class="text-red-500">*</span>: </label>
-                                <input type="tel" id="afa-retailer-phone-number" name="phoneNumber" class="input-field block w-full" placeholder="e.g., 0540000000" required>
-                            </div>
-                            <div>
-                                <label for="afa-retailer-ghana-card" class="block text-sm font-medium text-gray-700 mb-1">Ghana Card Number<span class="text-red-500">*</span>: </label>
+                                <label for="afa-retailer-ghana-card" class="block text-sm font-medium text-gray-700 mb-1">Client Ghana Card Number<span class="text-red-500">*</span>: </label>
                                 <input type="text" id="afa-retailer-ghana-card" name="ghanaCard" class="input-field block w-full" placeholder="GHA-000000000-0" required>
                             </div>
+                            <!-- NEW: Phone Number Input for AFA Retailer Registration -->
                             <div>
-                                <label for="afa-retailer-dob" class="block text-sm font-medium text-gray-700 mb-1">Date of Birth<span class="text-red-500">*</span>: </label>
+                                <label for="afa-retailer-phone-number" class="block text-sm font-medium text-gray-700 mb-1">Client Phone Number<span class="text-red-500">*</span>: </label>
+                                <input type="tel" id="afa-retailer-phone-number" name="phoneNumber" class="input-field block w-full" placeholder="e.g., 0535905900" required>
+                            </div>
+                            <div>
+                                <label for="afa-retailer-dob" class="block text-sm font-medium text-gray-700 mb-1">Client Date of Birth<span class="text-red-500">*</span>: </label>
                                 <input type="text" id="afa-retailer-dob" name="dob" class="input-field block w-full" placeholder="e.g., 10th March 1957" required>
                             </div>
                             <div>
-                                <label for="afa-retailer-location" class="block text-sm font-medium text-gray-700 mb-1">Location<span class="text-red-500">*</span>: </label>
+                                <label for="afa-retailer-location" class="block text-sm font-medium text-gray-700 mb-1">Client Location<span class="text-red-500">*</span>: </label>
                                 <input type="text" id="afa-retailer-location" name="location" class="input-field block w-full" placeholder="e.g., Kasoa, Central Region" required>
                             </div>
                             <div>
-                                <label for="afa-retailer-occupation" class="block text-sm font-medium text-gray-700 mb-1">Occupation<span class="text-red-500">*</span>: </label>
+                                <label for="afa-retailer-occupation" class="block text-sm font-medium text-gray-700 mb-1">Client Occupation<span class="text-red-500">*</span>: </label>
                                 <input type="text" id="afa-retailer-occupation" name="occupation" class="input-field block w-full" placeholder="e.g., Farmer" required>
                             </div>
                             <button type="submit" class="submit-button w-full py-2 px-4 rounded-md text-sm font-medium shadow-md transition-all duration-200 ease-in-out hover:shadow-lg">
-                                Register for AFA Bundle (GHS 10.00)
+                                Register Client for AFA Bundle (GHS 10.00)
                             </button>
                         </form>
                         <div id="afa-retailer-message-box" class="message-box info hidden mt-4"></div>
@@ -1122,40 +1210,40 @@
 
                 <section id="account-settings-section" class="hidden">
                     <div class="p-6 md:p-8">
-                        <h2 class="text-xl font-bold mb-6 text-center">Account Settings</h2>
+                        <h2 class="text-2xl font-bold mb-6 text-center">Account Settings</h2>
 
-                        <form id="profile-edit-form" class="space-y-4 mb-8">
-                            <h3 class="text-lg font-semibold mb-3">Edit Profile Information</h3>
+                        <form id="profile-edit-form" class="space-y-6 mb-8">
+                            <h3 class="text-xl font-semibold mb-4">Edit Profile Information</h3>
                             <div>
-                                <label for="profile-name" class="block text-xs font-medium text-gray-700 mb-1">Full Name:</label>
-                                <input type="text" id="profile-name" name="name" class="input-field block w-full text-sm">
+                                <label for="profile-name" class="block text-sm font-medium text-gray-700 mb-1">Full Name<span class="text-red-500">*</span>:</label>
+                                <input type="text" id="profile-name" name="name" class="input-field block w-full">
                             </div>
                             <div>
-                                <label for="profile-email" class="block text-xs font-medium text-gray-700 mb-1">Email Address:</label>
-                                <input type="email" id="profile-email" name="email" class="input-field block w-full text-sm">
+                                <label for="profile-email" class="block text-sm font-medium text-gray-700 mb-1">Email Address<span class="text-red-500">*</span>:</label>
+                                <input type="email" id="profile-email" name="email" class="input-field block w-full">
                             </div>
                             <div>
-                                <label for="profile-phone" class="block text-xs font-medium text-gray-700 mb-1">Phone Number:</label>
-                                <input type="tel" id="profile-phone" name="phone" class="input-field block w-full text-sm">
+                                <label for="profile-phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number<span class="text-red-500">*</span>:</label>
+                                <input type="tel" id="profile-phone" name="phone" class="input-field block w-full">
                             </div>
                             <button type="submit" class="submit-button w-full py-2 px-4 rounded-md text-sm font-medium shadow-md transition-all duration-200 ease-in-out hover:shadow-lg">
                                 Update Profile
                             </button>
                         </form>
 
-                        <form id="password-change-form" class="space-y-4">
-                            <h3 class="text-lg font-semibold mb-3">Change Password</h3>
+                        <form id="password-change-form" class="space-y-6">
+                            <h3 class="text-xl font-semibold mb-4">Change Password</h3>
                             <div>
-                                <label for="current-password" class="block text-xs font-medium text-gray-700 mb-1">Current Password:</label>
-                                <input type="password" id="current-password" name="currentPassword" class="input-field block w-full text-sm" required>
+                                <label for="current-password" class="block text-sm font-medium text-gray-700 mb-1">Current Password<span class="text-red-500">*</span>:</label>
+                                <input type="password" id="current-password" name="currentPassword" class="input-field block w-full" required>
                             </div>
                             <div>
-                                <label for="new-password" class="block text-xs font-medium text-gray-700 mb-1">New Password:</label>
-                                <input type="password" id="new-password" name="newPassword" class="input-field block w-full text-sm" required>
+                                <label for="new-password" class="block text-sm font-medium text-gray-700 mb-1">New Password<span class="text-red-500">*</span>:</label>
+                                <input type="password" id="new-password" name="newPassword" class="input-field block w-full" required>
                             </div>
                             <div>
-                                <label for="confirm-new-password" class="block text-xs font-medium text-gray-700 mb-1">Confirm New Password:</label>
-                                <input type="password" id="confirm-new-password" name="confirmNewPassword" class="input-field block w-full text-sm" required>
+                                <label for="confirm-new-password" class="block text-sm font-medium text-gray-700 mb-1">Confirm New Password<span class="text-red-500">*</span>:</label>
+                                <input type="password" id="confirm-new-password" name="confirmNewPassword" class="input-field block w-full" required>
                             </div>
                             <button type="submit" class="submit-button w-full py-2 px-4 rounded-md text-sm font-medium shadow-md transition-all duration-200 ease-in-out hover:shadow-lg">
                                 Change Password
@@ -1170,18 +1258,28 @@
 
     <!-- Template for a single order item to be cloned by JavaScript -->
     <template id="order-item-template">
-        <div class="single-order-item space-y-2">
+        <div class="single-order-item space-y-4">
             <button type="button" class="remove-order-item-btn" aria-label="Remove order item">X</button>
+            <div>
+                <label for="network-select" class="sr-only">Network</label>
+                <select id="network-select" name="network" required
+                        class="appearance-none relative block w-full input-field">
+                    <option value="" disabled selected>Select Network</option>
+                    <option value="MTN">MTN</option>
+                    <option value="AirtelTigo">AirtelTigo</option>
+                    <option value="Telecel">Telecel</option>
+                </select>
+            </div>
             <div>
                 <label for="contact-number" class="sr-only">Contact Number</label>
                 <input id="contact-number" name="contactNumber" type="tel" required
-                       class="appearance-none relative block w-full input-field text-sm"
+                       class="appearance-none relative block w-full input-field"
                        placeholder="Contact Number (e.g., 0531323296)">
             </div>
             <div>
                 <label for="data-size" class="sr-only">Data Size</label>
                 <select id="data-size" name="dataSize" required
-                        class="appearance-none relative block w-full input-field text-sm">
+                        class="appearance-none relative block w-full input-field">
                     <option value="" disabled selected>Select Data Size</option>
                     <!-- Options will be dynamically populated here with prices -->
                 </select>
@@ -1189,7 +1287,7 @@
             <div>
                 <label for="amount" class="sr-only">Amount</label>
                 <input id="amount" name="amount" type="text" readonly
-                       class="appearance-none relative block w-full input-field text-sm"
+                       class="appearance-none relative block w-full input-field"
                        placeholder="Amount (Ghc)" value="">
             </div>
         </div>
@@ -1197,7 +1295,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script> <!-- Added Firestore -->
 
     <script>
         // Your Firebase project configuration
@@ -1213,33 +1311,73 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        // const db = firebase.firestore(); // Uncomment if using Firestore
+        const db = firebase.firestore(); // Initialize Firestore
 
         document.addEventListener('DOMContentLoaded', () => {
-            // New prices provided by the user
-            const rawPrices = {
-                "1GB": "5.50Ghc", "2GB": "10.50Ghc", "3GB": "15Ghc", "4GB": "21Ghc",
-                "5GB": "25Ghc", "6GB": "29Ghc", "8GB": "38Ghc", "10GB": "45Ghc",
-                "15GB": "68Ghc", "20GB": "89Ghc", "30GB": "127.00Ghc", "50GB": "210.00Ghc",
+            // MTN Prices from the provided image
+            const mtnRawPrices = {
+                "1GB": "5.50Ghc", "2GB": "10.50Ghc", "3GB": "15.00Ghc", "4GB": "21.00Ghc",
+                "5GB": "25.00Ghc", "6GB": "29.00Ghc", "8GB": "38.00Ghc", "10GB": "45.00Ghc",
+                "15GB": "68.00Ghc", "20GB": "89.00Ghc", "30GB": "127.00Ghc", "50GB": "210.00Ghc",
                 "100GB": "408.00Ghc"
             };
 
-            // Convert rawPrices to the existing dataBundles format for all networks
-            const newBundles = Object.keys(rawPrices).map(size => {
-                const priceString = rawPrices[size];
-                const price = parseFloat(priceString.replace('Ghc', ''));
+            // AirtelTigo Prices from the first attached image - UPDATED
+            const atRawPrices = {
+                "1GB": "5.00Ghc", "2GB": "9.00Ghc", "3GB": "13.50Ghc", "4GB": "17.00Ghc",
+                "5GB": "22.00Ghc", "6GB": "27.00Ghc", "8GB": "35.00Ghc", "10GB": "44.00Ghc",
+                "15GB": "68.00Ghc", "20GB": "88.00Ghc", "25GB": "120.00Ghc", "30GB": "119.00Ghc",
+                "40GB": "165.00Ghc", "50GB": "199.00Ghc", "100GB": "400.00Ghc"
+            };
+
+            // Telecel Prices - UPDATED
+            const telecelRawPrices = {
+                "5GB": "25.00Ghc",
+                "10GB": "47.00Ghc",
+                "15GB": "70.00Ghc",
+                "20GB": "91.00Ghc",
+                "25GB": "115.00Ghc",
+                "30GB": "137.00Ghc",
+                "35GB": "160.00Ghc",
+                "40GB": "185.00Ghc",
+                "45GB": "207.00Ghc",
+                "50GB": "228.00Ghc",
+                "100GB": "430.00Ghc"
+            };
+
+            // Convert raw prices to bundle objects
+            const mtnBundles = Object.keys(mtnRawPrices).map(size => {
+                const price = parseFloat(mtnRawPrices[size].replace('Ghc', ''));
                 return { "size": size, "price": price, "validity": "30 days" };
             });
 
-            var dataBundles = {
-                "MTN": newBundles,
-                "Vodafone": newBundles,
-                "AirtelTigo": newBundles
-            };
-            const bundlePricesLookup = {};
-            newBundles.forEach(bundle => {
-                bundlePricesLookup[bundle.size] = bundle.price;
+            const atBundles = Object.keys(atRawPrices).map(size => {
+                const price = parseFloat(atRawPrices[size].replace('Ghc', ''));
+                return { "size": size, "price": price, "validity": "30 days" };
             });
+
+            const telecelBundles = Object.keys(telecelRawPrices).map(size => {
+                const price = parseFloat(telecelRawPrices[size].replace('Ghc', ''));
+                return { "size": size, "price": price, "validity": "30 days" };
+            });
+
+
+            // Consolidated dataBundles object for all networks
+            const allDataBundles = {
+                "MTN": mtnBundles,
+                "AirtelTigo": atBundles,
+                "Telecel": telecelBundles
+            };
+
+            // Lookups for easy price retrieval by size and network
+            const bundlePricesLookup = {
+                "MTN": {},
+                "AirtelTigo": {},
+                "Telecel": {}
+            };
+            mtnBundles.forEach(bundle => { bundlePricesLookup["MTN"][bundle.size] = bundle.price; });
+            atBundles.forEach(bundle => { bundlePricesLookup["AirtelTigo"][bundle.size] = bundle.price; });
+            telecelBundles.forEach(bundle => { bundlePricesLookup["Telecel"][bundle.size] = bundle.price; });
 
 
             // Data storage for order and user
@@ -1250,7 +1388,6 @@
             let registeredUserPhone = '';
             let retailerClients = new Set(); // To store unique client phone numbers for retailer
             let retailerTotalSales = 0; // To store total sales amount for retailer
-            // simulatedUserPassword is no longer needed with real Firebase Auth
             let currentOrders = [];
 
 
@@ -1265,28 +1402,38 @@
             const authTitle = document.getElementById('auth-title');
             const authSubtitle = document.getElementById('auth-subtitle');
             const messageBox = document.getElementById('message-box');
-            
-            const orderDetailsStep = document.getElementById('order-details-step');
-            const orderForm = document.getElementById('orderForm');
-            // Removed direct references to contactNumberInput, dataSizeSelect, amountInput
-            // as they will now be dynamic within order-items-container
-            const orderItemsContainer = document.getElementById('order-items-container');
-            const addAnotherOrderBtn = document.getElementById('add-another-order-btn');
-            const totalOrderAmountSpan = document.getElementById('total-order-amount');
+
+            // Order Sections for each network
+            const mtnOrderForm = document.getElementById('mtnOrderForm');
+            const mtnOrderItemsContainer = document.getElementById('mtn-order-items-container');
+            const addAnotherMtnOrderBtn = document.getElementById('add-another-mtn-order-btn');
+            const mtnTotalOrderAmountSpan = document.getElementById('mtn-total-order-amount');
+
+            const atOrderForm = document.getElementById('atOrderForm');
+            const atOrderItemsContainer = document.getElementById('at-order-items-container');
+            const addAnotherAtOrderBtn = document.getElementById('add-another-at-order-btn');
+            const atTotalOrderAmountSpan = document.getElementById('at-total-order-amount');
+
+            const telecelOrderForm = document.getElementById('telecelOrderForm');
+            const telecelOrderItemsContainer = document.getElementById('telecel-order-items-container');
+            const addAnotherTelecelOrderBtn = document.getElementById('add-another-telecel-order-btn');
+            const telecelTotalOrderAmountSpan = document.getElementById('telecel-total-order-amount');
 
 
             // Retailer Dashboard Navigation Buttons
             const dashboardMainBtn = document.getElementById('dashboard-main-btn'); // New button
-            const buyDataBtn = document.getElementById('buy-data-btn');
+            const mtnOrderPlacementBtn = document.getElementById('mtn-order-placement-btn');
+            const atOrderPlacementBtn = document.getElementById('at-order-placement-btn');
+            const telecelOrderPlacementBtn = document.getElementById('telecel-order-placement-btn');
             const afaBundleRetailerBtn = document.getElementById('afa-bundle-retailer-btn'); // New AFA Bundle Button
-            // Removed marketingToolsBtn
-            const accountSettingsDashboardBtn = document.getElementById('account-settings-dashboard-btn'); 
+            const accountSettingsBtn = document.getElementById('account-settings-btn');
 
             // Retailer Dashboard Sections
             const retailerStatsSection = document.getElementById('retailer-stats-section');
-            const orderPlacementSection = document.getElementById('order-placement-section');
+            const mtnOrderPlacementSection = document.getElementById('mtn-order-placement-section');
+            const atOrderPlacementSection = document.getElementById('at-order-placement-section');
+            const telecelOrderPlacementSection = document.getElementById('telecel-order-placement-section');
             const afaBundleRetailerSection = document.getElementById('afa-bundle-retailer-section'); // New AFA Bundle Section
-            // Removed marketingToolsSection
             const accountSettingsSection = document.getElementById('account-settings-section');
 
             // Retailer Dashboard Stat Displays
@@ -1322,7 +1469,12 @@
 
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
-            const mobileAgentLink = document.getElementById('mobile-agent-link');
+            const mobileDashboardLink = document.getElementById('mobile-dashboard-link');
+            const mobileMtnDataLink = document.getElementById('mobile-mtn-data-link');
+            const mobileAtDataLink = document.getElementById('mobile-at-data-link');
+            const mobileTelecelDataLink = document.getElementById('mobile-telecel-data-link');
+            const mobileAfaBundleRetailerLink = document.getElementById('mobile-afa-bundle-retailer-link');
+            const mobileAccountSettingsLink = document.getElementById('mobile-account-settings-link');
             const mobileContactLink = document.getElementById('mobile-contact-link');
             const agentMessageContainer = document.getElementById('agent-message-container');
 
@@ -1342,11 +1494,11 @@
 
 
             // Helper functions for showing/hiding sections
-            function showMainApp() {
+            function showMainApp(viewToDisplay = 'retailer-stats') {
                 preLoginSection.style.display = 'none';
                 mainAppSection.style.display = 'flex';
-                // Initially show the retailer stats overview
-                switchRetailerDashboardView('retailer-stats');
+                // Initially show the retailer stats overview or the last viewed section
+                switchRetailerDashboardView(viewToDisplay, false); // Don't push state on initial load
                 updateRetailerStats();
                 messageBox.classList.add('hidden');
             }
@@ -1367,8 +1519,8 @@
                 signInForm.classList.remove('hidden');
                 signUpForm.classList.add('hidden');
                 forgotPasswordForm.classList.add('hidden');
-                authTitle.textContent = 'Sign In'; 
-                authSubtitle.innerHTML = 'Not a Member yet? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signup">Sign Up</span>'; 
+                authTitle.textContent = 'Retailer Sign In';
+                authSubtitle.innerHTML = 'Not a Retailer yet? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signup">Register Here</span>';
             }
 
 
@@ -1386,12 +1538,21 @@
 
 
                     userDisplay.textContent = `Welcome, ${user.displayName || user.email}`;
-                    showMainApp();
+                    
+                    // Determine which view to display on auth state change
+                    let initialView = localStorage.getItem('lastRetailerView') || 'retailer-stats';
+                    const hashView = window.location.hash.substring(1); // Get view from URL hash
+                    if (hashView && document.getElementById(`${hashView}-section`)) { // Check if hash corresponds to a valid section
+                        initialView = hashView;
+                    }
+
+                    showMainApp(initialView); // Pass the determined view
                     displayMessage('You are signed in!', 'success');
                 } else {
                     console.log('User state changed: Signed OUT.');
                     showAuthForms();
                     displayMessage('Please sign in or sign up to place an order.', 'info');
+                    localStorage.removeItem('lastRetailerView'); // Clear last view on sign out
                 }
             });
 
@@ -1432,21 +1593,21 @@
                     return;
                 }
 
-                displayMessage('Signing up...', 'info');
+                displayMessage('Registering...', 'info');
 
                 try {
                     const userCredential = await auth.createUserWithEmailAndPassword(registeredUserEmail, signupPassword);
                     await userCredential.user.updateProfile({ displayName: registeredUserName });
                     
-                    displayMessage('Sign up successful! Please sign in using your new account.', 'success');
+                    displayMessage('Registration successful! Please sign in using your new account.', 'success');
                     signInForm.classList.remove('hidden');
                     signUpForm.classList.add('hidden');
                     forgotPasswordForm.classList.add('hidden');
-                    authTitle.textContent = 'Sign In'; 
-                    authSubtitle.innerHTML = 'Already a Member? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signin">Sign In</span>'; 
+                    authTitle.textContent = 'Retailer Sign In';
+                    authSubtitle.innerHTML = 'Not a Retailer yet? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signup">Register Here</span>';
                 } catch (error) {
                     console.error("Sign Up Error:", error);
-                    displayMessage(`Sign Up Failed: ${error.message}`, 'error');
+                    displayMessage(`Registration Failed: ${error.message}`, 'error');
                 }
             });
 
@@ -1470,14 +1631,14 @@
                         signInForm.classList.add('hidden');
                         signUpForm.classList.remove('hidden');
                         forgotPasswordForm.classList.add('hidden');
-                        authTitle.textContent = 'Sign Up'; 
-                        authSubtitle.innerHTML = 'Already a Member? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signin">Sign In</span>'; 
+                        authTitle.textContent = 'Retailer Registration';
+                        authSubtitle.innerHTML = 'Already a Retailer? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signin">Sign In</span>';
                     } else if (target === 'signin') {
                         signInForm.classList.remove('hidden');
                         signUpForm.classList.add('hidden');
                         forgotPasswordForm.classList.add('hidden');
-                        authTitle.textContent = 'Sign In';
-                        authSubtitle.innerHTML = 'Not a Member yet? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signup">Sign Up</span>';
+                        authTitle.textContent = 'Retailer Sign In';
+                        authSubtitle.innerHTML = 'Not a Retailer yet? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signup">Register Here</span>';
                     }
                     messageBox.classList.add('hidden');
                 }
@@ -1500,8 +1661,8 @@
                 signInForm.classList.remove('hidden');
                 signUpForm.classList.add('hidden');
                 forgotPasswordForm.classList.add('hidden');
-                authTitle.textContent = 'Sign In';
-                authSubtitle.innerHTML = 'Not a Member yet? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signup">Sign Up</span>';
+                authTitle.textContent = 'Retailer Sign In';
+                authSubtitle.innerHTML = 'Not a Retailer yet? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signup">Register Here</span>';
                 messageBox.classList.add('hidden');
             });
 
@@ -1519,10 +1680,10 @@
                             signInForm.classList.remove('hidden');
                             signUpForm.classList.add('hidden');
                             forgotPasswordForm.classList.add('hidden');
-                            authTitle.textContent = 'Sign In';
-                            authSubtitle.innerHTML = 'Not a Member yet? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signup">Sign Up</span>';
+                            authTitle.textContent = 'Retailer Sign In';
+                            authSubtitle.innerHTML = 'Not a Retailer yet? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signup">Register Here</span>';
                             messageBox.classList.add('hidden');
-                        }, 5000); 
+                        }, 5000);
                     }
                     catch (error) {
                         console.error("Password Reset Error:", error);
@@ -1552,75 +1713,106 @@
                 afaRetailerMessageBox.classList.remove('hidden');
             }
 
-            // --- Dynamic Order Form Logic ---
-            function addOrderItem() {
+            // --- Dynamic Order Form Logic for MTN, AT, and Telecel ---
+            function addOrderItem(containerElement, networkType) {
                 const clone = orderItemTemplate.content.cloneNode(true);
+                const networkSelect = clone.querySelector('[name="network"]');
                 const contactNumberInput = clone.querySelector('[name="contactNumber"]');
                 const dataSizeSelect = clone.querySelector('[name="dataSize"]');
                 const amountInput = clone.querySelector('[name="amount"]');
                 const removeButton = clone.querySelector('.remove-order-item-btn');
 
                 // Assign unique IDs to cloned elements and update labels
-                const currentCount = orderItemsContainer.children.length;
-                contactNumberInput.id = `contact-number-${currentCount}`;
-                contactNumberInput.previousElementSibling.setAttribute('for', `contact-number-${currentCount}`);
-                dataSizeSelect.id = `data-size-${currentCount}`;
-                dataSizeSelect.previousElementSibling.setAttribute('for', `data-size-${currentCount}`);
-                amountInput.id = `amount-${currentCount}`;
-                amountInput.previousElementSibling.setAttribute('for', `amount-${currentCount}`);
+                const currentCount = containerElement.children.length;
+                networkSelect.id = `network-select-${networkType}-${currentCount}`;
+                networkSelect.previousElementSibling.setAttribute('for', `network-select-${networkType}-${currentCount}`);
+                contactNumberInput.id = `contact-number-${networkType}-${currentCount}`;
+                contactNumberInput.previousElementSibling.setAttribute('for', `contact-number-${networkType}-${currentCount}`);
+                dataSizeSelect.id = `data-size-${networkType}-${currentCount}`;
+                dataSizeSelect.previousElementSibling.setAttribute('for', `data-size-${networkType}-${currentCount}`);
+                amountInput.id = `amount-${networkType}-${currentCount}`;
+                amountInput.previousElementSibling.setAttribute('for', `amount-${networkType}-${currentCount}`);
 
-                // Populate data size options with prices
-                dataSizeSelect.innerHTML = '<option value="" disabled selected>Select Data Size</option>';
-                newBundles.forEach(bundle => {
-                    const option = document.createElement('option');
-                    option.value = bundle.size;
-                    option.textContent = `${bundle.size} - GHS ${bundle.price.toFixed(2)}`;
-                    dataSizeSelect.appendChild(option);
-                });
+                // Pre-select the network based on the form type
+                networkSelect.value = networkType;
+                networkSelect.disabled = true; // Disable selection to ensure consistency
+
+                // Populate data size options based on the selected network
+                populateDataSizeOptions(dataSizeSelect, networkType);
 
                 // Attach event listener for data size change on this new item
                 dataSizeSelect.addEventListener('change', () => {
                     const selectedSize = dataSizeSelect.value;
-                    if (selectedSize && bundlePricesLookup[selectedSize]) {
-                        amountInput.value = bundlePricesLookup[selectedSize].toFixed(2);
+                    if (selectedSize && bundlePricesLookup[networkType][selectedSize]) {
+                        amountInput.value = bundlePricesLookup[networkType][selectedSize].toFixed(2);
                     } else {
                         amountInput.value = '';
                     }
-                    updateTotalAmount(); // Recalculate total when an item's amount changes
+                    updateTotalAmount(containerElement, networkType); // Recalculate total
                 });
 
                 // Attach event listener for remove button
                 removeButton.addEventListener('click', (event) => {
                     event.target.closest('.single-order-item').remove();
-                    updateTotalAmount(); // Recalculate total when an item is removed
+                    updateTotalAmount(containerElement, networkType); // Recalculate total
                 });
 
-                orderItemsContainer.appendChild(clone);
-                updateTotalAmount(); // Update total after adding a new item
+                containerElement.appendChild(clone);
+                updateTotalAmount(containerElement, networkType); // Update total after adding a new item
             }
 
-            function updateTotalAmount() {
+            function populateDataSizeOptions(selectElement, network) {
+                selectElement.innerHTML = '<option value="" disabled selected>Select Data Size</option>';
+                const bundles = allDataBundles[network];
+                const today = new Date();
+                const isSunday = today.getDay() === 0; // 0 is Sunday, 1 is Monday, etc.
+
+                if (bundles) {
+                    bundles.forEach(bundle => {
+                        // If it's MTN and Sunday, and the bundle is 1GB, skip it
+                        if (network === 'MTN' && bundle.size === '1GB' && isSunday) {
+                            return;
+                        }
+                        const option = document.createElement('option');
+                        option.value = bundle.size;
+                        option.textContent = `${bundle.size} - GHS ${bundle.price.toFixed(2)}`;
+                        selectElement.appendChild(option);
+                    });
+                }
+            }
+
+            function updateTotalAmount(containerElement, networkType) {
                 let total = 0;
-                // Select all amount inputs within the order-items-container
-                const amountInputs = orderItemsContainer.querySelectorAll('[name="amount"]');
+                const amountInputs = containerElement.querySelectorAll('[name="amount"]');
                 amountInputs.forEach(input => {
                     const value = parseFloat(input.value);
                     if (!isNaN(value)) {
                         total += value;
                     }
                 });
-                totalOrderAmountSpan.textContent = `GHS ${total.toFixed(2)}`;
+                if (networkType === 'MTN') {
+                    mtnTotalOrderAmountSpan.textContent = `GHS ${total.toFixed(2)}`;
+                } else if (networkType === 'AirtelTigo') {
+                    atTotalOrderAmountSpan.textContent = `GHS ${total.toFixed(2)}`;
+                } else if (networkType === 'Telecel') {
+                    telecelTotalOrderAmountSpan.textContent = `GHS ${total.toFixed(2)}`;
+                }
             }
+            
+            // Add initial order items for all forms
+            addOrderItem(mtnOrderItemsContainer, 'MTN');
+            addOrderItem(atOrderItemsContainer, 'AirtelTigo');
+            addOrderItem(telecelOrderItemsContainer, 'Telecel');
 
-            // Add initial order item when the page loads
-            addOrderItem();
 
-            // Event listener for "Add Another Order" button
-            addAnotherOrderBtn.addEventListener('click', addOrderItem);
+            // Event listeners for "Add Another Order" buttons
+            addAnotherMtnOrderBtn.addEventListener('click', () => addOrderItem(mtnOrderItemsContainer, 'MTN'));
+            addAnotherAtOrderBtn.addEventListener('click', () => addOrderItem(atOrderItemsContainer, 'AirtelTigo'));
+            addAnotherTelecelOrderBtn.addEventListener('click', () => addOrderItem(telecelOrderItemsContainer, 'Telecel'));
 
 
-            // --- Order Form Submission (Now initiates Paystack payment for multiple orders) ---
-            orderForm.addEventListener('submit', async (event) => {
+            // --- Order Form Submission (MTN, AT, and Telecel) ---
+            async function handleOrderSubmission(event, networkType) {
                 event.preventDefault();
 
                 if (!currentUserUid) {
@@ -1629,11 +1821,15 @@
                     return;
                 }
 
-                const allOrderItems = orderItemsContainer.querySelectorAll('.single-order-item');
+                const containerElement = 
+                    networkType === 'MTN' ? mtnOrderItemsContainer :
+                    networkType === 'AirtelTigo' ? atOrderItemsContainer :
+                    telecelOrderItemsContainer;
+
+                const allOrderItems = containerElement.querySelectorAll('.single-order-item');
                 const ordersToProcess = [];
                 let totalPaymentAmount = 0;
 
-                // Collect data for each order item
                 allOrderItems.forEach((item, index) => {
                     const contactNumber = item.querySelector('[name="contactNumber"]').value.trim();
                     const dataSize = item.querySelector('[name="dataSize"]').value;
@@ -1641,13 +1837,13 @@
 
                     if (!contactNumber || !dataSize || isNaN(amount) || amount <= 0) {
                         displayMessage(`Please fill all details for order item ${index + 1}.`, 'error');
-                        ordersToProcess.length = 0; // Clear array to prevent partial submission
-                        return; // Stop processing further
+                        ordersToProcess.length = 0;
+                        return;
                     }
 
                     ordersToProcess.push({
-                        type: 'data', // New property to distinguish order types
-                        network: 'MTN', // Assuming MTN for all for now
+                        type: 'data',
+                        network: networkType, // Dynamically set network
                         bundleSize: dataSize,
                         bundlePrice: amount,
                         recipientPhone: contactNumber,
@@ -1655,7 +1851,7 @@
                         customerEmail: registeredUserEmail || 'guest@example.com',
                         timestamp: new Date().toLocaleString(),
                         userId: currentUserUid,
-                        status: 'Initiated' // Initial status for Apps Script
+                        status: 'Initiated'
                     });
                     totalPaymentAmount += amount;
                 });
@@ -1673,47 +1869,39 @@
                 console.log('Orders to Process:', ordersToProcess);
                 console.log('------------------------------');
 
-
-                // --- Paystack Checkout Integration for combined amount ---
                 const handler = PaystackPop.setup({
-                    key: 'pk_live_8e753f43f8defed950965395fc04f5dc7ab1035b', // Your actual public key
-                    email: registeredUserEmail, // Pre-fill email
-                    amount: totalPaymentAmount * 100, // Amount in kobo/pesewas (multiply by 100)
-                    currency: 'GHS', // Ghana Cedis
-                    ref: 'ORD_' + Date.now(), // Unique reference for the entire transaction
-                    firstname: registeredUserName.split(' ')[0] || '', // Pre-fill first name
-                    lastname: registeredUserName.split(' ').slice(1).join(' ') || '',   // Pre-fill last name
+                    key: 'pk_live_8e753f43f8defed950965395fc04f5dc7ab1035b',
+                    email: registeredUserEmail,
+                    amount: totalPaymentAmount * 100,
+                    currency: 'GHS',
+                    ref: `${networkType}_ORD_${Date.now()}`, // Unique reference
+                    firstname: registeredUserName.split(' ')[0] || '',
+                    lastname: registeredUserName.split(' ').slice(1).join(' ') || '',
                     metadata: {
                         custom_fields: [
-                            {
-                                display_name: "Customer ID",
-                                variable_name: "customer_id",
-                                value: currentUserUid
-                            },
-                            {
-                                display_name: "Orders Details",
-                                variable_name: "orders_details",
-                                value: JSON.stringify(ordersToProcess) // Store all individual order details as a JSON string
-                            }
+                            { display_name: "Customer ID", variable_name: "customer_id", value: currentUserUid },
+                            { display_name: "Orders Details", variable_name: "orders_details", value: JSON.stringify(ordersToProcess) }
                         ]
                     },
-                    callback: function(response){ // Payment successful callback - Now a regular function
-                        (async () => { // Immediately Invoked Async Function Expression (IIAFE)
+                    callback: function(response){
+                        (async () => {
                             const paymentReference = response.reference;
-                            console.log('Paystack Payment Successful! Reference:', paymentReference);
+                            console.log('Paystack Payment Successful. Reference:', paymentReference);
                             
-                            // 1. Update local storage with new orders
+                            switchRetailerDashboardView('retailer-stats'); // Go to dashboard after payment
+                            displayMessage('Payment successful! Your order has been placed and confirmed.', 'success');
+
                             ordersToProcess.forEach(order => {
                                 const newOrder = {
-                                    id: 'ORD' + Date.now() + '-' + Math.floor(Math.random() * 1000), // More unique ID
-                                    type: 'data', // Explicitly set type
+                                    id: `${networkType}_ORD` + Date.now() + '-' + Math.floor(Math.random() * 1000),
+                                    type: 'data',
                                     network: order.network,
                                     bundle: order.bundleSize,
                                     price: order.bundlePrice,
                                     phone: order.recipientPhone,
-                                    paymentReference: paymentReference, // Use the single Paystack reference for all related orders
+                                    paymentReference: paymentReference,
                                     date: new Date().toLocaleString(),
-                                    status: 'Submitted' // Changed from 'Processing' to 'Submitted'
+                                    status: 'Submitted'
                                 };
                                 currentOrders.push(newOrder);
 
@@ -1727,115 +1915,153 @@
                             localStorage.setItem(`retailerClients_${currentUserUid}`, JSON.stringify(Array.from(retailerClients)));
                             localStorage.setItem(`retailerTotalSales_${currentUserUid}`, retailerTotalSales.toFixed(2));
 
+                            updateRetailerStats();
+                            renderOrders(); // Re-render the orders list to show the new order
 
-                            // 2. Switch to Retailer Stats view and automatically show orders
-                            switchRetailerDashboardView('retailer-stats'); 
-                            ordersList.classList.remove('hidden'); // Show orders list
-                            toggleOrdersDisplayButton.textContent = 'Hide Order History'; // Update button text
-                            // 3. Display a success message (this message will appear on the 'My Orders' tab, replacing any previous messages)
-                            displayMessage('Payment successful! Your order has been placed and confirmed.', 'success');
-
-
-                            // 4. Reset order form (can happen in background as user is on 'My Orders')
-                            orderItemsContainer.innerHTML = ''; // Clear all existing items
-                            addOrderItem(); // Add a fresh, empty order item
-                            updateTotalAmount(); // Reset total amount display
+                            // Reset the relevant form
+                            if (networkType === 'MTN') {
+                                mtnOrderItemsContainer.innerHTML = '';
+                                addOrderItem(mtnOrderItemsContainer, 'MTN');
+                                mtnTotalOrderAmountSpan.textContent = 'GHS 0.00';
+                            } else if (networkType === 'AirtelTigo') {
+                                atOrderItemsContainer.innerHTML = '';
+                                addOrderItem(atOrderItemsContainer, 'AirtelTigo');
+                                atTotalOrderAmountSpan.textContent = 'GHS 0.00';
+                            } else if (networkType === 'Telecel') {
+                                telecelOrderItemsContainer.innerHTML = '';
+                                addOrderItem(telecelOrderItemsContainer, 'Telecel');
+                                telecelTotalOrderAmountSpan.textContent = 'GHS 0.00';
+                            }
                             
-                            // 5. Send data to Google Apps Script (this can be fire-and-forget or await)
-                            // Keeping it await for robustness, but it won't block the UI switch
-                            const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwKwu8XC1awByOIwiTXGGY7iMr1J_vNSrZ1tUv7tPY-Edlzvrs5H1SWyHKIjz86leYi/exec'; // Corrected Apps Script URL
+                            const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwKwu8XC1awByOIwiTXGGY7iMr1J_vNSrZ1tUv7tPY-Edlzvrs5H1SWyHKIjz86leYi/exec';
 
                             try {
                                 const scriptResponse = await fetch(GOOGLE_APPS_SCRIPT_URL, {
                                     method: 'POST',
-                                    mode: 'no-cors', // Required for simple requests to Apps Script
+                                    mode: 'no-cors',
                                     cache: 'no-cache',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                    },
+                                    headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({
                                         customerName: registeredUserName,
                                         customerEmail: registeredUserEmail,
                                         customerId: currentUserUid,
                                         orders: ordersToProcess.map(order => ({
                                             ...order,
-                                            status: 'Submitted', // Changed from 'Processing' to 'Submitted'
-                                            paymentReference: paymentReference // Add the Paystack reference
+                                            status: 'Submitted',
+                                            paymentReference: paymentReference
                                         }))
                                     })
                                 });
-
                                 console.log('Order details sent to Google Apps Script. Response (if any, will be opaque due to no-cors):', scriptResponse);
-                                // No need for a second displayMessage here, the first one is the "receipt"
-
                             } catch (error) {
                                 console.error('Error sending order details to Google Apps Script:', error);
-                                // If Apps Script fails, still inform user on the My Orders page
-                                displayMessage('Order logging failed. Please contact support. (Payment was successful)', 'error');
+                                displayMessage('Order logging failed. Please contact support.', 'error');
                             }
-                        })(); // End of IIAFE
+                        })();
                     },
-                    onClose: function(){ // Payment modal closed callback
+                    onClose: function(){
                         displayMessage('Payment process cancelled by user.', 'info');
                     }
                 });
-                handler.openIframe(); // Open the Paystack payment modal
-            });
+                handler.openIframe();
+            }
+
+            mtnOrderForm.addEventListener('submit', (event) => handleOrderSubmission(event, 'MTN'));
+            atOrderForm.addEventListener('submit', (event) => handleOrderSubmission(event, 'AirtelTigo'));
+            telecelOrderForm.addEventListener('submit', (event) => handleOrderSubmission(event, 'Telecel'));
 
 
             // --- Retailer Dashboard Navigation ---
             // Event listener for the new "Dashboard" button
             dashboardMainBtn.addEventListener('click', () => switchRetailerDashboardView('retailer-stats'));
-            buyDataBtn.addEventListener('click', () => switchRetailerDashboardView('buy-data'));
+            mtnOrderPlacementBtn.addEventListener('click', () => switchRetailerDashboardView('mtn-order-placement'));
+            atOrderPlacementBtn.addEventListener('click', () => switchRetailerDashboardView('at-order-placement'));
+            telecelOrderPlacementBtn.addEventListener('click', () => switchRetailerDashboardView('telecel-order-placement'));
             afaBundleRetailerBtn.addEventListener('click', () => switchRetailerDashboardView('afa-bundle-retailer')); // New AFA Bundle Button Listener
-            accountSettingsDashboardBtn.addEventListener('click', () => switchRetailerDashboardView('account-settings')); 
+            accountSettingsBtn.addEventListener('click', () => switchRetailerDashboardView('account-settings'));
 
-            function switchRetailerDashboardView(view) {
+            function switchRetailerDashboardView(view, pushState = true) {
+                // Store the current view in localStorage
+                localStorage.setItem('lastRetailerView', view);
+                
+                // Update browser history if pushState is true
+                if (pushState) {
+                    history.pushState({ view: view }, '', `#${view}`);
+                }
+
+                // Hide all sections
                 retailerStatsSection.classList.add('hidden');
-                orderPlacementSection.classList.add('hidden');
+                mtnOrderPlacementSection.classList.add('hidden');
+                atOrderPlacementSection.classList.add('hidden');
+                telecelOrderPlacementSection.classList.add('hidden');
                 afaBundleRetailerSection.classList.add('hidden'); // Hide new AFA section
                 accountSettingsSection.classList.add('hidden');
-                accountMessageBox.classList.add('hidden'); 
-                afaRetailerMessageBox.classList.add('hidden'); // Hide AFA message box
-
+                accountMessageBox.classList.add('hidden');
+                afaRetailerMessageBox.classList.add('hidden');
 
                 // Remove active class from all buttons
                 dashboardMainBtn.classList.remove('active');
-                buyDataBtn.classList.remove('active');
+                mtnOrderPlacementBtn.classList.remove('active');
+                atOrderPlacementBtn.classList.remove('active');
+                telecelOrderPlacementBtn.classList.remove('active');
                 afaBundleRetailerBtn.classList.remove('active'); // Remove active from AFA button
-                accountSettingsDashboardBtn.classList.remove('active'); 
+                accountSettingsBtn.classList.remove('active');
 
                 // Close all AFA accordions when switching views
                 closeAllAfaAccordions();
 
                 if (view === 'retailer-stats') {
                     retailerStatsSection.classList.remove('hidden');
-                    dashboardMainBtn.classList.add('active'); 
+                    dashboardMainBtn.classList.add('active');
                     updateRetailerStats(); // Refresh stats
                     ordersList.classList.add('hidden'); // Hide orders list by default
                     toggleOrdersDisplayButton.textContent = 'Order History'; // Reset button text
-                } else if (view === 'buy-data') {
-                    orderPlacementSection.classList.remove('hidden');
-                    buyDataBtn.classList.add('active');
+                } else if (view === 'mtn-order-placement') {
+                    mtnOrderPlacementSection.classList.remove('hidden');
+                    mtnOrderPlacementBtn.classList.add('active');
                     // Reset order form and add initial item when switching to this view
-                    orderItemsContainer.innerHTML = '';
-                    addOrderItem();
-                    updateTotalAmount();
-                    orderDetailsStep.classList.remove('hidden');
+                    mtnOrderItemsContainer.innerHTML = '';
+                    addOrderItem(mtnOrderItemsContainer, 'MTN');
+                    updateTotalAmount(mtnOrderItemsContainer, 'MTN');
                     messageBox.classList.add('hidden');
-                } else if (view === 'afa-bundle-retailer') { // Handle new AFA bundle view
+                } else if (view === 'at-order-placement') {
+                    atOrderPlacementSection.classList.remove('hidden');
+                    atOrderPlacementBtn.classList.add('active');
+                    atOrderItemsContainer.innerHTML = '';
+                    addOrderItem(atOrderItemsContainer, 'AirtelTigo');
+                    updateTotalAmount(atOrderItemsContainer, 'AirtelTigo');
+                    messageBox.classList.add('hidden');
+                } else if (view === 'telecel-order-placement') {
+                    telecelOrderPlacementSection.classList.remove('hidden');
+                    telecelOrderPlacementBtn.classList.add('active');
+                    telecelOrderItemsContainer.innerHTML = '';
+                    addOrderItem(telecelOrderItemsContainer, 'Telecel');
+                    updateTotalAmount(telecelOrderItemsContainer, 'Telecel');
+                    messageBox.classList.add('hidden');
+                }
+                else if (view === 'afa-bundle-retailer') { // Handle new AFA bundle view
                     afaBundleRetailerSection.classList.remove('hidden');
                     afaBundleRetailerBtn.classList.add('active');
                     afaRegistrationRetailerForm.reset(); // Clear form on view switch
                     afaRetailerMessageBox.classList.add('hidden'); // Ensure message box is hidden
-                } 
+                }
                 else if (view === 'account-settings') {
                     accountSettingsSection.classList.remove('hidden');
-                    accountSettingsDashboardBtn.classList.add('active'); 
+                    accountSettingsBtn.classList.add('active');
                     populateAccountSettings();
                 }
                 currentView = view;
             }
+
+            // Listen for browser's back/forward button events
+            window.addEventListener('popstate', (event) => {
+                if (event.state && event.state.view) {
+                    switchRetailerDashboardView(event.state.view, false); // Don't push state again
+                } else {
+                    // If no specific state, default to retailer-stats or initial page
+                    switchRetailerDashboardView(localStorage.getItem('lastRetailerView') || 'retailer-stats', false);
+                }
+            });
 
             // --- AFA Call Bundle Registration Form Submission (Retailer) ---
             afaRegistrationRetailerForm.addEventListener('submit', async (event) => {
@@ -1848,20 +2074,20 @@
                 }
 
                 const fullName = document.getElementById('afa-retailer-full-name').value.trim();
-                const phoneNumber = afaRetailerPhoneNumberInput.value.trim(); // Get the new phone number
                 const ghanaCard = document.getElementById('afa-retailer-ghana-card').value.trim();
+                const phoneNumber = afaRetailerPhoneNumberInput.value.trim(); // Get the new phone number
                 const dob = document.getElementById('afa-retailer-dob').value.trim();
                 const location = document.getElementById('afa-retailer-location').value.trim();
                 const occupation = document.getElementById('afa-retailer-occupation').value.trim();
 
-                if (!fullName || !phoneNumber || !ghanaCard || !dob || !location || !occupation) {
+                if (!fullName || !ghanaCard || !phoneNumber || !dob || !location || !occupation) {
                     displayAfaRetailerMessage('Please fill in all required fields.', 'error');
                     return;
                 }
 
                 displayAfaRetailerMessage('Initiating AFA bundle registration payment...', 'info');
 
-                const AFA_BUNDLE_PRICE = 10.00; // Fixed price for AFA bundle, changed to 10.00
+                const AFA_BUNDLE_PRICE = 10.00; // Fixed price for AFA bundle
                 const handler = PaystackPop.setup({
                     key: 'pk_live_8e753f43f8defed950965395fc04f5dc7ab1035b', // Your actual public key
                     email: registeredUserEmail,
@@ -1875,8 +2101,8 @@
                             { display_name: "Customer ID", variable_name: "customer_id", value: currentUserUid },
                             { display_name: "Service Type", variable_name: "service_type", value: "AFA Call Bundle" },
                             { display_name: "Full Name", variable_name: "full_name", value: fullName },
-                            { display_name: "Phone Number", variable_name: "phone_number", value: phoneNumber }, // Include phone number
                             { display_name: "Ghana Card", variable_name: "ghana_card", value: ghanaCard },
+                            { display_name: "Phone Number", variable_name: "phone_number", value: phoneNumber }, // Include phone number
                             { display_name: "Date of Birth", variable_name: "date_of_birth", value: dob },
                             { display_name: "Location", variable_name: "location", value: location },
                             { display_name: "Occupation", variable_name: "occupation", value: occupation }
@@ -1911,7 +2137,7 @@
 
 
                             // 2. Switch to Retailer Stats view and automatically show orders
-                            switchRetailerDashboardView('retailer-stats'); 
+                            switchRetailerDashboardView('retailer-stats');
                             ordersList.classList.remove('hidden'); // Show orders list
                             toggleOrdersDisplayButton.textContent = 'Hide Order History'; // Update button text
                             // 3. Display a success message
@@ -2004,8 +2230,8 @@
                                 <p><strong>Service Type:</strong> AFA Call Bundle</p>
                                 <p><strong>Registration Fee:</strong> GHS ${order.price.toFixed(2)}</p>
                                 <p><strong>Full Name:</strong> ${order.details.fullName}</p>
-                                <p><strong>Phone Number:</strong> ${order.details.phoneNumber}</p> <!-- Display phone number -->
                                 <p><strong>Ghana Card:</strong> ${order.details.ghanaCard}</p>
+                                <p><strong>Phone Number:</strong> ${order.details.phoneNumber}</p> <!-- Display phone number -->
                                 <p><strong>Date of Birth:</strong> ${order.details.dob}</p>
                                 <p><strong>Location:</strong> ${order.details.location}</p>
                                 <p><strong>Occupation:</strong> ${order.details.occupation}</p>
@@ -2039,7 +2265,7 @@
                 if (currentUserUid) {
                     profileNameInput.value = registeredUserName;
                     profileEmailInput.value = registeredUserEmail;
-                    profilePhoneInput.value = registeredUserPhone; 
+                    profilePhoneInput.value = registeredUserPhone;
                 } else {
                     profileNameInput.value = '';
                     profileEmailInput.value = '';
@@ -2073,7 +2299,7 @@
                         }
                         registeredUserName = newName;
                         registeredUserEmail = newEmail;
-                        registeredUserPhone = newPhone; 
+                        registeredUserPhone = newPhone;
                         userDisplay.textContent = `Welcome, ${registeredUserName}!`;
                         displayAccountMessage('Profile updated successfully!', 'success');
                     } else {
@@ -2136,25 +2362,48 @@
             });
 
             // --- Mobile Menu Links Functionality ---
+            mobileDashboardLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                switchRetailerDashboardView('retailer-stats');
+                mobileMenu.classList.remove('open');
+            });
+            mobileMtnDataLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                switchRetailerDashboardView('mtn-order-placement');
+                mobileMenu.classList.remove('open');
+            });
+            mobileAtDataLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                switchRetailerDashboardView('at-order-placement');
+                mobileMenu.classList.remove('open');
+            });
+            mobileTelecelDataLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                switchRetailerDashboardView('telecel-order-placement');
+                mobileMenu.classList.remove('open');
+            });
+            mobileAfaBundleRetailerLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                switchRetailerDashboardView('afa-bundle-retailer');
+                mobileMenu.classList.remove('open');
+            });
+            mobileAccountSettingsLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                switchRetailerDashboardView('account-settings');
+                mobileMenu.classList.remove('open');
+            });
             mobileContactLink.addEventListener('click', (event) => {
                 event.preventDefault();
                 event.stopPropagation();
-                window.open('https://wa.me/233531323296', '_blank'); 
+                window.open('https://wa.me/233531323296', '_blank');
                 agentMessageContainer.classList.remove('show');
-                mobileMenu.classList.remove('open'); 
-            });
-
-            mobileAgentLink.addEventListener('click', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                agentMessageContainer.classList.toggle('show');
-                mobileMenu.classList.remove('open'); 
+                mobileMenu.classList.remove('open');
             });
 
 
             // Global click handler to close menus/info boxes
             document.addEventListener('click', (event) => {
-                const isClickInsideAgent = agentMessageContainer.contains(event.target) || mobileAgentLink.contains(event.target);
+                const isClickInsideAgent = agentMessageContainer.contains(event.target) || mobileContactLink.contains(event.target);
                 const isClickInsideMobileMenuButton = mobileMenuButton.contains(event.target);
                 const isClickInsideMobileMenu = mobileMenu.contains(event.target);
                 const isClickInsideAfaSection = afaBundleRetailerSection.contains(event.target);
@@ -2208,7 +2457,7 @@
                 mainFaqContent.classList.toggle('open');
                 mainFaqToggleButton.classList.toggle('active');
 
-                if (mainFajContent.classList.contains('open')) {
+                if (mainFaqContent.classList.contains('open')) {
                     mainFaqContent.style.maxHeight = mainFaqContent.scrollHeight + "px";
                 } else {
                     mainFaqContent.style.maxHeight = "0";
