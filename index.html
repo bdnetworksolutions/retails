@@ -602,6 +602,19 @@
             background-color: #dc2626; /* Darker red */
         }
 
+        /* Styles for the network display tab */
+        .network-display-tab {
+            background-color: #FFD700; /* MTN Yellow */
+            color: #1f2937; /* Dark text */
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1rem; /* Space below the tab */
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
         /* FAQ Section Styles */
         .faq-section {
             background-color: #ffffff;
@@ -1260,14 +1273,16 @@
     <template id="order-item-template">
         <div class="single-order-item space-y-4">
             <button type="button" class="remove-order-item-btn" aria-label="Remove order item">X</button>
-            <div>
-                <label for="network-select" class="sr-only">Network</label>
-                <select id="network-select" name="network" required
+            <div class="network-display-tab flex items-center justify-center p-2 rounded-md bg-gray-200 text-gray-700 font-semibold mb-2">
+                <span id="network-name-display"></span>
+            </div>
+            <div class="server-type-container"> <!-- Added container for conditional display -->
+                <label for="server-type" class="sr-only">Server Type</label>
+                <select id="server-type" name="serverType"
                         class="appearance-none relative block w-full input-field">
-                    <option value="" disabled selected>Select Network</option>
-                    <option value="MTN">MTN</option>
-                    <option value="AirtelTigo">AirtelTigo</option>
-                    <option value="Telecel">Telecel</option>
+                    <option value="" disabled selected>Select Server (A: Normal, B: Faster)</option>
+                    <option value="serverA">Server A (Normal Delivery)</option>
+                    <option value="serverB">Server B (Faster Delivery)</option>
                 </select>
             </div>
             <div>
@@ -1314,70 +1329,86 @@
         const db = firebase.firestore(); // Initialize Firestore
 
         document.addEventListener('DOMContentLoaded', () => {
-            // MTN Prices from the provided image
+            // MTN Prices with Server A and Server B options
             const mtnRawPrices = {
-                "1GB": "5.50Ghc", "2GB": "10.50Ghc", "3GB": "15.00Ghc", "4GB": "21.00Ghc",
-                "5GB": "25.00Ghc", "6GB": "29.00Ghc", "8GB": "38.00Ghc", "10GB": "45.00Ghc",
-                "15GB": "68.00Ghc", "20GB": "89.00Ghc", "30GB": "127.00Ghc", "50GB": "210.00Ghc"
-            
+                "1GB": { "serverA": 5.00, "serverB": 5.60 },
+                "2GB": { "serverA": 9.00, "serverB": 11.50 },
+                "3GB": { "serverA": 14.00, "serverB": 15.50 },
+                "4GB": { "serverA": 19.50, "serverB": 22.00 },
+                "5GB": { "serverA": 23.50, "serverB": 25.50 },
+                "6GB": { "serverA": 28.00, "serverB": 33.00 },
+                "7GB": { "serverA": 35.00, "serverB": null }, // Existing, keep as is
+                "8GB": { "serverA": 36.00, "serverB": 40.50 },
+                "10GB": { "serverA": 44.50, "serverB": 47.00 },
+                "15GB": { "serverA": 66.00, "serverB": 70.00 },
+                "20GB": { "serverA": 88.00, "serverB": 95.00 },
+                "24GB": { "serverA": null, "serverB": 115.00 }, // Existing, keep as is
+                "30GB": { "serverA": 126.50, "serverB": 135.00 },
+                "50GB": { "serverA": 210.00, "serverB": null } // 50GB removed from Server B
             };
 
-            // AirtelTigo Prices from the first attached image - UPDATED
+            // AirtelTigo Prices (single server) - unchanged from previous update
             const atRawPrices = {
-                "1GB": "5.00Ghc", "2GB": "9.00Ghc", "3GB": "13.50Ghc", "4GB": "17.00Ghc",
-                "5GB": "22.00Ghc", "6GB": "27.00Ghc", "8GB": "35.00Ghc", "10GB": "44.00Ghc",
-                "15GB": "68.00Ghc", "20GB": "88.00Ghc", "25GB": "120.00Ghc", "30GB": "119.00Ghc",
-                "40GB": "165.00Ghc", "50GB": "199.00Ghc", "100GB": "400.00Ghc"
+                "1GB": 5.00, "2GB": 10.00, "3GB": 15.00, "4GB": 19.00,
+                "5GB": 24.00, "6GB": 29.00, "8GB": 38.00, "10GB": 46.00,
+                "15GB": 70.00, "20GB": 90.00, "25GB": 102.00, "30GB": 120.00,
+                "40GB": 150.00, "50GB": 180.00, "200GB": 425.00
             };
 
-            // Telecel Prices - UPDATED
+            // Telecel Prices (single server) - unchanged from previous update
             const telecelRawPrices = {
-                "5GB": "25.00Ghc",
-                "10GB": "47.00Ghc",
-                "15GB": "70.00Ghc",
-                "20GB": "91.00Ghc",
-                "25GB": "115.00Ghc",
-                "30GB": "137.00Ghc",
-                "35GB": "160.00Ghc",
-                "40GB": "185.00Ghc",
-                "45GB": "207.00Ghc",
-                "50GB": "228.00Ghc",
-                "100GB": "430.00Ghc"
+                "5GB": 27.00,
+                "10GB": 54.00,
+                "15GB": 72.00,
+                "20GB": 102.00, "25GB": 125.00, "30GB": 150.00,
+                "35GB": 180.00, "40GB": 200.00, "45GB": 225.00
             };
 
-            // Convert raw prices to bundle objects
-            const mtnBundles = Object.keys(mtnRawPrices).map(size => {
-                const price = parseFloat(mtnRawPrices[size].replace('Ghc', ''));
-                return { "size": size, "price": price, "validity": "30 days" };
-            });
+            // Helper to convert raw prices to bundle objects for a specific server (MTN only)
+            function createBundlesForServer(rawPrices, serverType) {
+                return Object.keys(rawPrices)
+                    .filter(size => rawPrices[size][serverType] !== null) // Filter out null prices for a given server
+                    .map(size => {
+                        const price = rawPrices[size][serverType];
+                        return { "size": size, "price": price, "validity": "30 days" };
+                    });
+            }
 
-            const atBundles = Object.keys(atRawPrices).map(size => {
-                const price = parseFloat(atRawPrices[size].replace('Ghc', ''));
-                return { "size": size, "price": price, "validity": "30 days" };
-            });
+            // Helper to convert raw prices to bundle objects for single-server networks
+            function createSingleServerBundles(rawPrices) {
+                return Object.keys(rawPrices).map(size => {
+                    const price = rawPrices[size];
+                    return { "size": size, "price": price, "validity": "30 days" };
+                });
+            }
 
-            const telecelBundles = Object.keys(telecelRawPrices).map(size => {
-                const price = parseFloat(telecelRawPrices[size].replace('Ghc', ''));
-                return { "size": size, "price": price, "validity": "30 days" };
-            });
-
-
-            // Consolidated dataBundles object for all networks
+            // Consolidated dataBundles object
             const allDataBundles = {
-                "MTN": mtnBundles,
-                "AirtelTigo": atBundles,
-                "Telecel": telecelBundles
+                "MTN": {
+                    "serverA": createBundlesForServer(mtnRawPrices, "serverA"),
+                    "serverB": createBundlesForServer(mtnRawPrices, "serverB")
+                },
+                "AirtelTigo": createSingleServerBundles(atRawPrices),
+                "Telecel": createSingleServerBundles(telecelRawPrices)
             };
 
-            // Lookups for easy price retrieval by size and network
+            // Lookups for easy price retrieval by size, network, and server type
             const bundlePricesLookup = {
-                "MTN": {},
+                "MTN": { "serverA": {}, "serverB": {} },
                 "AirtelTigo": {},
                 "Telecel": {}
             };
-            mtnBundles.forEach(bundle => { bundlePricesLookup["MTN"][bundle.size] = bundle.price; });
-            atBundles.forEach(bundle => { bundlePricesLookup["AirtelTigo"][bundle.size] = bundle.price; });
-            telecelBundles.forEach(bundle => { bundlePricesLookup["Telecel"][bundle.size] = bundle.price; });
+
+            // Populate the lookup tables for MTN
+            ["serverA", "serverB"].forEach(serverType => {
+                allDataBundles["MTN"][serverType].forEach(bundle => {
+                    bundlePricesLookup["MTN"][serverType][bundle.size] = bundle.price;
+                });
+            });
+
+            // Populate the lookup tables for AirtelTigo and Telecel (single level)
+            allDataBundles["AirtelTigo"].forEach(bundle => { bundlePricesLookup["AirtelTigo"][bundle.size] = bundle.price; });
+            allDataBundles["Telecel"].forEach(bundle => { bundlePricesLookup["Telecel"][bundle.size] = bundle.price; });
 
 
             // Data storage for order and user
@@ -1604,7 +1635,7 @@
                     signUpForm.classList.add('hidden');
                     forgotPasswordForm.classList.add('hidden');
                     authTitle.textContent = 'Retailer Sign In';
-                    authSubtitle.innerHTML = 'Not a Retailer yet? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signup">Register Here</span>';
+                    authSubtitle.innerHTML = 'Already a Retailer? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signin">Sign In</span>';
                 } catch (error) {
                     console.error("Sign Up Error:", error);
                     displayMessage(`Registration Failed: ${error.message}`, 'error');
@@ -1716,7 +1747,9 @@
             // --- Dynamic Order Form Logic for MTN, AT, and Telecel ---
             function addOrderItem(containerElement, networkType) {
                 const clone = orderItemTemplate.content.cloneNode(true);
-                const networkSelect = clone.querySelector('[name="network"]');
+                const networkNameDisplay = clone.querySelector('#network-name-display'); // New element
+                const serverTypeSelect = clone.querySelector('[name="serverType"]');
+                const serverTypeContainer = clone.querySelector('.server-type-container'); // Get the container
                 const contactNumberInput = clone.querySelector('[name="contactNumber"]');
                 const dataSizeSelect = clone.querySelector('[name="dataSize"]');
                 const amountInput = clone.querySelector('[name="amount"]');
@@ -1724,8 +1757,9 @@
 
                 // Assign unique IDs to cloned elements and update labels
                 const currentCount = containerElement.children.length;
-                networkSelect.id = `network-select-${networkType}-${currentCount}`;
-                networkSelect.previousElementSibling.setAttribute('for', `network-select-${networkType}-${currentCount}`);
+                // No need for ID on network-select anymore as it's a display div
+                serverTypeSelect.id = `server-type-${networkType}-${currentCount}`;
+                serverTypeSelect.previousElementSibling.setAttribute('for', `server-type-${networkType}-${currentCount}`);
                 contactNumberInput.id = `contact-number-${networkType}-${currentCount}`;
                 contactNumberInput.previousElementSibling.setAttribute('for', `contact-number-${networkType}-${currentCount}`);
                 dataSizeSelect.id = `data-size-${networkType}-${currentCount}`;
@@ -1733,21 +1767,44 @@
                 amountInput.id = `amount-${networkType}-${currentCount}`;
                 amountInput.previousElementSibling.setAttribute('for', `amount-${networkType}-${currentCount}`);
 
-                // Pre-select the network based on the form type
-                networkSelect.value = networkType;
-                networkSelect.disabled = true; // Disable selection to ensure consistency
+                // Set the network display text
+                networkNameDisplay.textContent = networkType.toUpperCase(); // Display network name
 
-                // Populate data size options based on the selected network
-                populateDataSizeOptions(dataSizeSelect, networkType);
-
+                // Conditionally show/hide server type dropdown
+                if (networkType === 'MTN') {
+                    serverTypeContainer.style.display = 'block'; // Show for MTN
+                    serverTypeSelect.required = true; // Make required for MTN
+                    serverTypeSelect.value = 'serverA'; // Default to Server A for MTN
+                    populateDataSizeOptions(dataSizeSelect, networkType, serverTypeSelect.value); // Populate for default server
+                    serverTypeSelect.addEventListener('change', () => {
+                        const selectedServer = serverTypeSelect.value;
+                        populateDataSizeOptions(dataSizeSelect, networkType, selectedServer);
+                        dataSizeSelect.value = ''; // Reset data size
+                        amountInput.value = ''; // Clear amount
+                        updateTotalAmount(containerElement, networkType);
+                    });
+                } else {
+                    serverTypeContainer.style.display = 'none'; // Hide for AT and Telecel
+                    serverTypeSelect.required = false; // Not required
+                    serverTypeSelect.value = ''; // Clear value
+                    populateDataSizeOptions(dataSizeSelect, networkType); // Populate without server type
+                }
+                
                 // Attach event listener for data size change on this new item
                 dataSizeSelect.addEventListener('change', () => {
                     const selectedSize = dataSizeSelect.value;
-                    if (selectedSize && bundlePricesLookup[networkType][selectedSize]) {
-                        amountInput.value = bundlePricesLookup[networkType][selectedSize].toFixed(2);
+                    let price = 0;
+                    if (networkType === 'MTN') {
+                        const selectedServer = serverTypeSelect.value;
+                        if (selectedSize && selectedServer && bundlePricesLookup[networkType][selectedServer][selectedSize]) {
+                            price = bundlePricesLookup[networkType][selectedServer][selectedSize];
+                        }
                     } else {
-                        amountInput.value = '';
+                        if (selectedSize && bundlePricesLookup[networkType][selectedSize]) {
+                            price = bundlePricesLookup[networkType][selectedSize];
+                        }
                     }
+                    amountInput.value = price > 0 ? price.toFixed(2) : '';
                     updateTotalAmount(containerElement, networkType); // Recalculate total
                 });
 
@@ -1761,18 +1818,17 @@
                 updateTotalAmount(containerElement, networkType); // Update total after adding a new item
             }
 
-            function populateDataSizeOptions(selectElement, network) {
+            function populateDataSizeOptions(selectElement, network, serverType = null) {
                 selectElement.innerHTML = '<option value="" disabled selected>Select Data Size</option>';
-                const bundles = allDataBundles[network];
-                const today = new Date();
-                const isSunday = today.getDay() === 0; // 0 is Sunday, 1 is Monday, etc.
-
+                let bundles;
+                if (network === 'MTN' && serverType) {
+                    bundles = allDataBundles[network][serverType];
+                } else {
+                    bundles = allDataBundles[network];
+                }
+                
                 if (bundles) {
                     bundles.forEach(bundle => {
-                        // If it's MTN and Sunday, and the bundle is 1GB, skip it
-                        if (network === 'MTN' && bundle.size === '1GB' && isSunday) {
-                            return;
-                        }
                         const option = document.createElement('option');
                         option.value = bundle.size;
                         option.textContent = `${bundle.size} - GHS ${bundle.price.toFixed(2)}`;
@@ -1833,9 +1889,10 @@
                 allOrderItems.forEach((item, index) => {
                     const contactNumber = item.querySelector('[name="contactNumber"]').value.trim();
                     const dataSize = item.querySelector('[name="dataSize"]').value;
+                    const serverType = networkType === 'MTN' ? item.querySelector('[name="serverType"]').value : 'N/A'; // Get server type only for MTN
                     const amount = parseFloat(item.querySelector('[name="amount"]').value);
 
-                    if (!contactNumber || !dataSize || isNaN(amount) || amount <= 0) {
+                    if (!contactNumber || !dataSize || isNaN(amount) || amount <= 0 || (networkType === 'MTN' && !serverType)) {
                         displayMessage(`Please fill all details for order item ${index + 1}.`, 'error');
                         ordersToProcess.length = 0;
                         return;
@@ -1847,6 +1904,7 @@
                         bundleSize: dataSize,
                         bundlePrice: amount,
                         recipientPhone: contactNumber,
+                        serverType: serverType, // Include server type (N/A for AT/Telecel)
                         customerDisplayName: registeredUserName || 'N/A',
                         customerEmail: registeredUserEmail || 'guest@example.com',
                         timestamp: new Date().toLocaleString(),
@@ -1899,6 +1957,7 @@
                                     bundle: order.bundleSize,
                                     price: order.bundlePrice,
                                     phone: order.recipientPhone,
+                                    server: order.serverType, // Store server type
                                     paymentReference: paymentReference,
                                     date: new Date().toLocaleString(),
                                     status: 'Submitted'
@@ -2224,6 +2283,7 @@
                                 <p><strong>Bundle:</strong> ${order.bundle}</p>
                                 <p><strong>Price:</strong> GHS ${order.price.toFixed(2)}</p>
                                 <p><strong>Phone:</strong> ${order.phone}</p>
+                                ${order.server && order.server !== 'N/A' ? `<p><strong>Server:</strong> ${order.server === 'serverA' ? 'Server A (Normal)' : 'Server B (Faster)'}</p>` : ''}
                             `;
                         } else if (order.type === 'afa_bundle' && order.details) {
                             orderContent = `
@@ -2317,7 +2377,7 @@
 
                 const currentPassword = currentPasswordInput.value;
                 const newPassword = newPasswordInput.value;
-                const confirmNewPassword = confirmNewPasswordInput.value;
+                const confirmNewPassword = confirmNewNewPassword.value;
 
                 if (!currentPassword || !newPassword || !confirmNewPassword) {
                     displayAccountMessage('All password fields are required.', 'error');
