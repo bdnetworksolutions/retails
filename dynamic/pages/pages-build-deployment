@@ -1,0 +1,5 @@
+permissions:
+  id-token: write
+  contents: read
+
+# Existing content of the workflow file goes here...
