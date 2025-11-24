@@ -1276,15 +1276,7 @@
             <div class="network-display-tab flex items-center justify-center p-2 rounded-md bg-gray-200 text-gray-700 font-semibold mb-2">
                 <span id="network-name-display"></span>
             </div>
-            <div class="server-type-container"> <!-- Added container for conditional display -->
-                <label for="server-type" class="sr-only">Server Type</label>
-                <select id="server-type" name="serverType"
-                        class="appearance-none relative block w-full input-field">
-                    <option value="" disabled selected>Select Server (A: Normal, B: Faster)</option>
-                    <option value="serverA">Server A (Normal Delivery)</option>
-                    <option value="serverB">Server B (Faster Delivery)</option>
-                </select>
-            </div>
+            <!-- Removed server-type selector (Server A removed) -->
             <div>
                 <label for="contact-number" class="sr-only">Contact Number</label>
                 <input id="contact-number" name="contactNumber" type="tel" required
@@ -1329,7 +1321,7 @@
         const db = firebase.firestore(); // Initialize Firestore
 
         document.addEventListener('DOMContentLoaded', () => {
-            // MTN Prices with Server A and Server B options
+            // MTN Prices with Server A and Server B options (serverA will be ignored on site until you provide new prices)
             const mtnRawPrices = {
                 "1GB": { "serverA": 5.00, "serverB": 5.60 },
                 "2GB": { "serverA": 9.00, "serverB": 11.50 },
@@ -1337,17 +1329,17 @@
                 "4GB": { "serverA": 19.50, "serverB": 22.00 },
                 "5GB": { "serverA": 23.50, "serverB": 25.50 },
                 "6GB": { "serverA": 28.00, "serverB": 33.00 },
-                "7GB": { "serverA": 35.00, "serverB": null }, // Existing, keep as is
+                "7GB": { "serverA": 35.00, "serverB": null },
                 "8GB": { "serverA": 36.00, "serverB": 40.50 },
                 "10GB": { "serverA": 44.50, "serverB": 47.00 },
                 "15GB": { "serverA": 66.00, "serverB": 70.00 },
                 "20GB": { "serverA": 88.00, "serverB": 95.00 },
-                "24GB": { "serverA": null, "serverB": 115.00 }, // Existing, keep as is
+                "24GB": { "serverA": null, "serverB": 115.00 },
                 "30GB": { "serverA": 126.50, "serverB": 135.00 },
-                "50GB": { "serverA": 210.00, "serverB": null } // 50GB removed from Server B
+                "50GB": { "serverA": 210.00, "serverB": null }
             };
 
-            // AirtelTigo Prices (single server) - unchanged from previous update
+            // AirtelTigo Prices (single server)
             const atRawPrices = {
                 "1GB": 5.00, "2GB": 10.00, "3GB": 15.00, "4GB": 19.00,
                 "5GB": 24.00, "6GB": 29.00, "8GB": 38.00, "10GB": 46.00,
@@ -1355,7 +1347,7 @@
                 "40GB": 150.00, "50GB": 180.00, "200GB": 425.00
             };
 
-            // Telecel Prices (single server) - unchanged from previous update
+            // Telecel Prices (single server)
             const telecelRawPrices = {
                 "5GB": 27.00,
                 "10GB": 54.00,
@@ -1382,31 +1374,22 @@
                 });
             }
 
-            // Consolidated dataBundles object
+            // NOTE: Server A removed from UI. Use Server B bundles for MTN by default.
             const allDataBundles = {
-                "MTN": {
-                    "serverA": createBundlesForServer(mtnRawPrices, "serverA"),
-                    "serverB": createBundlesForServer(mtnRawPrices, "serverB")
-                },
+                "MTN": createBundlesForServer(mtnRawPrices, "serverB"), // only Server B bundles shown/used
                 "AirtelTigo": createSingleServerBundles(atRawPrices),
                 "Telecel": createSingleServerBundles(telecelRawPrices)
             };
 
-            // Lookups for easy price retrieval by size, network, and server type
+            // Lookups for easy price retrieval by size, network
             const bundlePricesLookup = {
-                "MTN": { "serverA": {}, "serverB": {} },
+                "MTN": {},
                 "AirtelTigo": {},
                 "Telecel": {}
             };
 
-            // Populate the lookup tables for MTN
-            ["serverA", "serverB"].forEach(serverType => {
-                allDataBundles["MTN"][serverType].forEach(bundle => {
-                    bundlePricesLookup["MTN"][serverType][bundle.size] = bundle.price;
-                });
-            });
-
-            // Populate the lookup tables for AirtelTigo and Telecel (single level)
+            // Populate the lookup tables
+            allDataBundles["MTN"].forEach(bundle => { bundlePricesLookup["MTN"][bundle.size] = bundle.price; });
             allDataBundles["AirtelTigo"].forEach(bundle => { bundlePricesLookup["AirtelTigo"][bundle.size] = bundle.price; });
             allDataBundles["Telecel"].forEach(bundle => { bundlePricesLookup["Telecel"][bundle.size] = bundle.price; });
 
@@ -1519,7 +1502,6 @@
             // Main FAQ toggle elements
             const mainFaqToggleButton = document.getElementById('main-faq-toggle-button');
             const mainFaqContent = document.getElementById('main-faq-content');
-
 
             let currentView = 'retailer-stats'; // Default view for retailer dashboard
 
@@ -1748,8 +1730,6 @@
             function addOrderItem(containerElement, networkType) {
                 const clone = orderItemTemplate.content.cloneNode(true);
                 const networkNameDisplay = clone.querySelector('#network-name-display'); // New element
-                const serverTypeSelect = clone.querySelector('[name="serverType"]');
-                const serverTypeContainer = clone.querySelector('.server-type-container'); // Get the container
                 const contactNumberInput = clone.querySelector('[name="contactNumber"]');
                 const dataSizeSelect = clone.querySelector('[name="dataSize"]');
                 const amountInput = clone.querySelector('[name="amount"]');
@@ -1757,9 +1737,6 @@
 
                 // Assign unique IDs to cloned elements and update labels
                 const currentCount = containerElement.children.length;
-                // No need for ID on network-select anymore as it's a display div
-                serverTypeSelect.id = `server-type-${networkType}-${currentCount}`;
-                serverTypeSelect.previousElementSibling.setAttribute('for', `server-type-${networkType}-${currentCount}`);
                 contactNumberInput.id = `contact-number-${networkType}-${currentCount}`;
                 contactNumberInput.previousElementSibling.setAttribute('for', `contact-number-${networkType}-${currentCount}`);
                 dataSizeSelect.id = `data-size-${networkType}-${currentCount}`;
@@ -1770,34 +1747,16 @@
                 // Set the network display text
                 networkNameDisplay.textContent = networkType.toUpperCase(); // Display network name
 
-                // Conditionally show/hide server type dropdown
-                if (networkType === 'MTN') {
-                    serverTypeContainer.style.display = 'block'; // Show for MTN
-                    serverTypeSelect.required = true; // Make required for MTN
-                    serverTypeSelect.value = 'serverA'; // Default to Server A for MTN
-                    populateDataSizeOptions(dataSizeSelect, networkType, serverTypeSelect.value); // Populate for default server
-                    serverTypeSelect.addEventListener('change', () => {
-                        const selectedServer = serverTypeSelect.value;
-                        populateDataSizeOptions(dataSizeSelect, networkType, selectedServer);
-                        dataSizeSelect.value = ''; // Reset data size
-                        amountInput.value = ''; // Clear amount
-                        updateTotalAmount(containerElement, networkType);
-                    });
-                } else {
-                    serverTypeContainer.style.display = 'none'; // Hide for AT and Telecel
-                    serverTypeSelect.required = false; // Not required
-                    serverTypeSelect.value = ''; // Clear value
-                    populateDataSizeOptions(dataSizeSelect, networkType); // Populate without server type
-                }
-                
+                // Populate data size options (Server A removed: MTN uses Server B bundles)
+                populateDataSizeOptions(dataSizeSelect, networkType);
+
                 // Attach event listener for data size change on this new item
                 dataSizeSelect.addEventListener('change', () => {
                     const selectedSize = dataSizeSelect.value;
                     let price = 0;
                     if (networkType === 'MTN') {
-                        const selectedServer = serverTypeSelect.value;
-                        if (selectedSize && selectedServer && bundlePricesLookup[networkType][selectedServer][selectedSize]) {
-                            price = bundlePricesLookup[networkType][selectedServer][selectedSize];
+                        if (selectedSize && bundlePricesLookup[networkType][selectedSize]) {
+                            price = bundlePricesLookup[networkType][selectedSize];
                         }
                     } else {
                         if (selectedSize && bundlePricesLookup[networkType][selectedSize]) {
@@ -1821,8 +1780,9 @@
             function populateDataSizeOptions(selectElement, network, serverType = null) {
                 selectElement.innerHTML = '<option value="" disabled selected>Select Data Size</option>';
                 let bundles;
-                if (network === 'MTN' && serverType) {
-                    bundles = allDataBundles[network][serverType];
+                // MTN now uses allDataBundles["MTN"] (server B only)
+                if (network === 'MTN') {
+                    bundles = allDataBundles[network];
                 } else {
                     bundles = allDataBundles[network];
                 }
@@ -1886,15 +1846,16 @@
                 const ordersToProcess = [];
                 let totalPaymentAmount = 0;
 
-                allOrderItems.forEach((item, index) => {
+                for (let index = 0; index < allOrderItems.length; index++) {
+                    const item = allOrderItems[index];
                     const contactNumber = item.querySelector('[name="contactNumber"]').value.trim();
                     const dataSize = item.querySelector('[name="dataSize"]').value;
-                    const serverType = networkType === 'MTN' ? item.querySelector('[name="serverType"]').value : 'N/A'; // Get server type only for MTN
+                    // Server A removed: use serverB implicitly for MTN
+                    const serverType = (networkType === 'MTN') ? 'serverB' : 'N/A';
                     const amount = parseFloat(item.querySelector('[name="amount"]').value);
 
-                    if (!contactNumber || !dataSize || isNaN(amount) || amount <= 0 || (networkType === 'MTN' && !serverType)) {
+                    if (!contactNumber || !dataSize || isNaN(amount) || amount <= 0) {
                         displayMessage(`Please fill all details for order item ${index + 1}.`, 'error');
-                        ordersToProcess.length = 0;
                         return;
                     }
 
@@ -1904,7 +1865,7 @@
                         bundleSize: dataSize,
                         bundlePrice: amount,
                         recipientPhone: contactNumber,
-                        serverType: serverType, // Include server type (N/A for AT/Telecel)
+                        serverType: serverType, // serverB for MTN, N/A otherwise
                         customerDisplayName: registeredUserName || 'N/A',
                         customerEmail: registeredUserEmail || 'guest@example.com',
                         timestamp: new Date().toLocaleString(),
@@ -1912,7 +1873,7 @@
                         status: 'Initiated'
                     });
                     totalPaymentAmount += amount;
-                });
+                }
 
                 if (ordersToProcess.length === 0) {
                     displayMessage('No valid orders to process.', 'error');
@@ -2377,7 +2338,7 @@
 
                 const currentPassword = currentPasswordInput.value;
                 const newPassword = newPasswordInput.value;
-                const confirmNewPassword = confirmNewNewPassword.value;
+                const confirmNewPassword = confirmNewPasswordInput.value;
 
                 if (!currentPassword || !newPassword || !confirmNewPassword) {
                     displayAccountMessage('All password fields are required.', 'error');
@@ -2586,3 +2547,4 @@
     </script>
 </body>
 </html>
+```
