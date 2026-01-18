@@ -1,57 +1,2588 @@
-// Updated MTN pricing to enable Server A prices while keeping Server B values.
-var mtnRawPrices = {
-    "1GB": { serverA: 4.60, serverB: existingValue1 },
-    "2GB": { serverA: 9.50, serverB: existingValue2 },
-    "3GB": { serverA: 13.50, serverB: existingValue3 },
-    "4GB": { serverA: 18.00, serverB: existingValue4 },
-    "5GB": { serverA: 22.20, serverB: existingValue5 },
-    "6GB": { serverA: 27.00, serverB: existingValue6 },
-    "8GB": { serverA: 36.00, serverB: existingValue7 },
-    "10GB": { serverA: 43.00, serverB: existingValue8 },
-    "15GB": { serverA: 63.00, serverB: existingValue9 },
-    "20GB": { serverA: 83.00, serverB: existingValue10 },
-    "25GB": { serverA: 102.00, serverB: existingValue11 },
-    "30GB": { serverA: 122.00, serverB: existingValue12 }
-};
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BD TECH SOLUTIONS - Retailer Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Paystack Checkout SDK -->
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <style>
+        /* Import Inter font from Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-// Modifying the order item template to include a server selector.
-function renderOrderItemTemplate() {
-    return `<div class='single-order-item'>
-        <select class='server-selector'>
-            <option value='serverA'>Server A</option>
-            <option value='serverB'>Server B</option>
-        </select>
-        <!-- Additional order item fields -->
-    </div>`;
-}
+        /* Base body styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #1f2937; /* Dark gray text */
+        }
 
-// Updating populateDataSizeOptions to accept serverType.
-function populateDataSizeOptions(selectElement, network, serverType = 'serverA') {
-    const prices = mtnRawPrices;
-    const sizeOptions = Object.keys(prices);
-    sizeOptions.forEach(size => {
-        const price = prices[size][serverType];
-        // Populate the selectElement with sizes and prices.
-        selectElement.append(new Option(size + ' - $' + price, size));
-    });
-}
+        /* Main navigation bar styling */
+        .main-navbar {
+            background-color: #FFD700; /* MTN Yellow */
+            color: #1f2937; /* Dark text for contrast */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            position: relative; /* Needed for absolute positioning of mobile menu */
+            z-index: 40; /* Ensure navbar is above other content */
+        }
 
-// Updating addOrderItem method to include the server selection logic.
-function addOrderItem() {
-    let item = renderOrderItemTemplate();
-    // Default selection to serverA
-    document.querySelector('.server-selector').value = 'serverA';
-    // Logic to handle value changes and update accordingly
-}
+        /* Logo text styling - Reduced size */
+        .main-navbar .logo-text {
+            color: #1f2937; /* Dark text for brand name on yellow background */
+            font-size: 1.3rem; /* Slightly reduced again for more compactness */
+            font-weight: 800; /* Extra bold */
+            white-space: nowrap; /* Prevent wrapping */
+        }
 
-// Adjusting the MTN order submission handler.
-function handleOrderSubmission(orderItems) {
-    orderItems.forEach(item => {
-        const serverType = item.querySelector('.server-selector').value;
-        // Record the serverType with each order object.
-        item.serverType = serverType;
-    });
-}
+        /* Slogan text styling - Adjusted margin */
+        .main-navbar .slogan-text {
+            color: #374151; /* A slightly darker gray for subtlety */
+            font-size: 0.6rem; /* Slightly smaller for better fit */
+            margin-top: -0.1rem; /* Pull it slightly closer to the main text */
+            white-space: nowrap; /* Prevent wrapping */
+        }
 
-// Keeping allDataBundles initialization flexible to server selection.
-let allDataBundles = { bundles: mtnRawPrices, serverType: null };
+        /* Hero section styling */
+        .hero-section {
+            background-image: url('https://i.imgur.com/7bSulGO.jpeg'); /* Background image */
+            background-size: cover; /* Cover the entire area */
+            background-position: center; /* Center the background image */
+            min-height: 100vh; /* Adjusted to 100vh for better mobile adaptability */
+            display: flex;
+            align-items: center; /* Center content vertically */
+            position: relative; /* Needed for overlay */
+            padding: 2rem 0; /* Vertical padding */
+        }
+
+        /* Hero overlay for text readability */
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+            z-index: 1;
+        }
+
+        /* Wrapper for hero content */
+        .hero-content-wrapper {
+            position: relative;
+            z-index: 2;
+            color: #ffffff; /* White text for hero content */
+            display: flex;
+            flex-direction: column; /* Stack vertically on small screens */
+            align-items: center; /* Center items on small screens */
+            justify-content: center; /* Distribute space */
+            width: 100%;
+        }
+
+        /* Media query for medium screens and up to arrange hero content side-by-side */
+        @media (min-width: 768px) {
+            .hero-content-wrapper {
+                flex-direction: row;
+                align-items: flex-start; /* Align to the top of the flex container */
+                justify-content: space-around; /* Adjust spacing */
+                padding: 0 2rem; /* Horizontal padding */
+            }
+        }
+
+        /* Hero text content styling */
+        .hero-text-content {
+            text-align: center; /* Center text on small screens */
+            margin-bottom: 2rem; /* Space between text and card on small screens */
+            width: 100%; /* Full width on small screens */
+        }
+
+        /* Media query for medium screens and up for hero text alignment */
+        @media (min-width: 768px) {
+            .hero-text-content {
+                text-align: left; /* Align text to left on larger screens */
+                width: 45%; /* Take up roughly half the width */
+                margin-bottom: 0;
+            }
+        }
+
+        /* Adjusted H1 font size for hero section */
+        .hero-text-content h1 {
+            font-size: 2rem; /* Reduced from 2.25rem for better mobile fit */
+            font-weight: 800; /* Extra bold */
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            max-width: 500px; /* Constrain width for readability */
+            margin-left: auto; /* Center on small screens */
+            margin-right: auto; /* Center on small screens */
+        }
+
+        /* Media query for larger screens for H1 font size */
+        @media (min-width: 768px) {
+            .hero-text-content h1 {
+                font-size: 3.25rem; /* Slightly reduced from 3.5rem for desktop */
+                margin-left: 0;
+                margin-right: 0;
+            }
+        }
+
+        /* Blended Card Styling - Adjusted for better visibility (for auth section) */
+        .card {
+            background-color: rgba(255, 255, 255, 0.85); /* 85% transparent white */
+            backdrop-filter: blur(6px); /* Blur effect */
+            -webkit-backdrop-filter: blur(6px); /* Safari support */
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5); /* Stronger shadow */
+            border-radius: 12px;
+            padding: 2.5rem;
+            color: #1f2937; /* Dark text for better contrast */
+            border: 1px solid rgba(255, 255, 255, 0.7); /* More visible white border */
+            width: 100%;
+            max-width: 448px; /* Max width for the card */
+        }
+
+        /* Media query for medium screens and up for card width */
+        @media (min-width: 768px) {
+            .card {
+                width: 45%;
+            }
+        }
+
+        /* Input field styling for better visibility and spacing */
+        .input-field {
+            background-color: #ffffff; /* Solid white background */
+            border: 1px solid #cbd5e1; /* Light gray border */
+            color: #1f2937; /* Dark text */
+            padding: 0.75rem 1rem; /* Added more padding */
+            border-radius: 0.5rem; /* Increased border-radius to 0.5rem */
+            /* Removed margin-bottom here to use space-y on parent for better control */
+        }
+        .input-field:focus {
+            border-color: #FFD700; /* Yellow border on focus */
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.4); /* Yellow glow on focus */
+        }
+        /* Message box styling */
+        .message-box {
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+        .message-box.info {
+            background-color: #e0f2fe;
+            color: #0c4a6e;
+            border: 1px solid #90cdf4;
+        }
+        .message-box.success {
+            background-color: #fffbeb;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
+        .message-box.error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border-color: #fca5a5;
+        }
+
+        /* User info bar styling */
+        .user-info-bar {
+            background-color: #2d3748; /* Dark background as seen in the image */
+            color: #FFD700; /* MTN Yellow for text */
+            padding: 0.8rem 1.5rem; /* Adjusted padding for a fuller bar */
+            border-radius: 8px; /* Rounded corners */
+            display: flex; /* Use flexbox for alignment */
+            flex-direction: row; /* Arrange items horizontally */
+            align-items: center; /* Vertically center items */
+            justify-content: space-between; /* Space between user display and button */
+            font-weight: 600;
+            margin-bottom: 2rem; /* Space below the user info bar */
+            width: 100%; /* Ensure it spans the full width of its parent */
+        }
+
+        #user-display {
+            font-size: 1.1rem; /* Slightly larger font for welcome message */
+            font-weight: 700; /* Bold */
+            color: #FFD700; /* Yellow text for welcome message */
+            white-space: nowrap; /* Prevent wrapping for the name */
+            overflow: hidden; /* Hide overflow if name is too long */
+            text-overflow: ellipsis; /* Add ellipsis for long names */
+            margin-right: 1rem; /* Space between text and button */
+        }
+
+        .user-info-bar button {
+            background-color: #FFD700; /* MTN Yellow for sign out button */
+            color: #1f2937; /* Dark text for contrast on yellow */
+            padding: 0.6rem 1.2rem; /* Padding for the button */
+            border-radius: 6px;
+            font-weight: 600;
+            transition: background-color 0.2s, color 0.2s;
+            border: none; /* Remove default button border */
+            cursor: pointer;
+        }
+        .user-info-bar button:hover {
+            background-color: #FFC000; /* Slightly darker yellow on hover */
+            color: #000000; /* Black text on hover for more contrast */
+        }
+
+        /* Adjust for small screens if needed */
+        @media (max-width: 640px) {
+            .user-info-bar {
+                flex-direction: column; /* Stack items vertically on small screens */
+                align-items: flex-start; /* Align text to the left */
+                padding: 1rem;
+            }
+            #user-display {
+                margin-right: 0;
+                margin-bottom: 0.5rem; /* Space between name and button */
+                text-align: left;
+                width: 100%;
+            }
+            .user-info-bar button {
+                width: auto; /* Allow button to size naturally */
+                align-self: flex-end; /* Align button to the right */
+            }
+        }
+
+        /* Adjust specific text/elements inside the card */
+        #auth-title, #main-app-section h2, #retailer-dashboard-content h2,
+        #mtn-order-details-step h3, #at-order-details-step h3, #telecel-order-details-step h3 { /* Added new sections */
+            color: #1f2937; /* Headings to dark */
+            text-shadow: none;
+        }
+        #auth-subtitle, .text-gray-600 {
+            color: #4a5568; /* Standard gray for readability */
+        }
+
+        /* Payment account details styling */
+        .payment-account {
+            background-color: #f9fafb; /* Light background */
+            border: 1px solid #e5e7eb;
+            color: #1f2937; /* Dark text */
+            padding: 1rem; /* Added padding */
+            border-radius: 0.5rem; /* Rounded corners */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Subtle shadow */
+        }
+        .payment-account strong, .payment-account p {
+            color: #1f2937; /* Dark text */
+        }
+        .payment-account img {
+            height: auto;
+            max-width: 60px; /* Reduced logo size in payment accounts */
+            margin-right: 0.75rem;
+            vertical-align: middle;
+            background-color: transparent;
+            padding: 0;
+            border-radius: 0;
+        }
+
+        /* Agent Message Display styling (contact-name-container removed) */
+        #agent-message-container {
+            background-color: #fffbeb; /* Light yellow background */
+            color: #92400e; /* Dark brown text */
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none; /* Prevents interaction when hidden */
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+            max-width: 350px;
+            text-align: center;
+            border: 1px solid #fcd34d;
+            position: absolute; /* Position absolutely */
+            top: 5rem; /* Below the nav bar */
+            right: 1.5rem; /* Align with right edge */
+            z-index: 30; /* Ensure it's above other content */
+        }
+        #agent-message-container.show {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto; /* Enables interaction when shown */
+        }
+
+        /* Styles for the new dashboard navigation buttons */
+        .dashboard-nav-buttons button {
+            background-color: #FFD700;
+            color: #1f2937;
+            padding: 0.4rem 0.6rem; /* Further reduced padding */
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.8rem; /* Further reduced font size for text */
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex; /* Make buttons flexible for icons */
+            flex-direction: column; /* Stack icon and text vertically */
+            align-items: center;
+            justify-content: center; /* Center content vertically within button */
+            gap: 0.05rem; /* Further reduced gap */
+            text-align: center; /* Center the text below the icon */
+            min-height: 70px; /* Slightly smaller min height */
+        }
+        .dashboard-nav-buttons button i {
+            font-size: 1.1rem; /* Further adjusted icon size */
+            margin-bottom: 0.05rem; /* Very small space below icon */
+        }
+        .dashboard-nav-buttons button:hover {
+            background-color: #FFC000;
+            transform: translateY(-2px);
+        }
+        .dashboard-nav-buttons button.active {
+            background-color: #1f2937; /* Dark background for active button */
+            color: #FFD700; /* Yellow text for active button */
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3); /* Inset shadow for pressed look */
+        }
+        /* Adjust grid for 6 columns on larger screens (for retailer) */
+        @media (min-width: 768px) {
+            .dashboard-nav-buttons {
+                grid-template-columns: repeat(4, minmax(0, 1fr)); /* Adjusted to 4 columns for retailer */
+            }
+        }
+
+        /* Styling for individual order items */
+        #orders-list > div {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem; /* Slightly smaller text for orders */
+        }
+        #orders-list > div p {
+            color: #1f2937;
+        }
+        #orders-list > div strong {
+            color: #1f2937;
+        }
+        .mark-delivered-btn {
+            background-color: #10b981; /* Green */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 0.5rem; /* Space from other text */
+        }
+        .mark-delivered-btn:hover {
+            background-color: #059669; /* Darker green */
+        }
+
+
+        /* Hamburger menu button styling - Always visible */
+        #mobile-menu-button {
+            display: block; /* Always show hamburger button */
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            z-index: 60; /* Ensure it's above the mobile menu */
+        }
+        #mobile-menu-button svg {
+            width: 28px;
+            height: 28px;
+            fill: #1f2937; /* Dark color for icon */
+            stroke: #1f2937; /* Ensure stroke is also dark for visibility */
+        }
+
+        /* Mobile menu styling (hidden by default, slides in) */
+        #mobile-menu {
+            position: absolute; /* Changed from fixed to absolute */
+            top: 100%; /* Position below the navbar */
+            right: 1rem; /* Align to the right of the navbar */
+            width: 200px; /* Fixed width for a dropdown */
+            height: auto; /* Adjust height based on content */
+            background-color: #ffffff; /* White background */
+            color: #1f2937; /* Dark text */
+            border: 1px solid #e2e8f0; /* Light border */
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Subtle shadow */
+            opacity: 0; /* Start invisible */
+            visibility: hidden; /* Hide completely */
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; /* Fade transition */
+            z-index: 50; /* Ensure it's above other content */
+            padding: 0.5rem 0; /* Adjusted padding */
+            display: flex; /* Use flex for internal layout */
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        #mobile-menu.open {
+            opacity: 1; /* Fade in */
+            visibility: visible; /* Make visible */
+            /* No transform needed for a fade-in dropdown */
+        }
+        #mobile-menu a {
+            color: #1f2937; /* Dark text for menu items */
+            padding: 0.75rem 1rem; /* Adjusted padding */
+            width: 100%;
+            text-align: center;
+            font-size: 1rem; /* text-base */
+            font-weight: 500; /* Medium weight */
+            transition: background-color 0.2s;
+        }
+        #mobile-menu a:hover {
+            background-color: #f0f2f5; /* Light gray on hover */
+        }
+
+        /* Hide desktop nav links on all screens */
+        .main-navbar .desktop-nav-links {
+            display: none;
+        }
+
+        /* New styles for full-screen dashboard */
+        #main-app-section {
+            min-height: calc(100vh - 4rem); /* Adjust based on navbar height */
+            width: 100%;
+            padding-top: 1rem;
+            padding-bottom: 2rem;
+            background-color: #f0f2f5; /* Match body background */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center content horizontally */
+        }
+        #main-app-section > .container {
+            width: 100%;
+            max-width: 1200px; /* Max width for overall dashboard content */
+        }
+        .dashboard-content-wrapper {
+            width: 100%;
+            /* Removed max-width here, handled by #dashboard-content-area */
+            /* Removed margin-left/right here, handled by #dashboard-content-area */
+        }
+
+        /* Dashboard Content Area (the white card that contains the order page) */
+        #dashboard-content-area {
+            background-color: #ffffff; /* White background for the main dashboard area */
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem; /* Padding inside this container */
+            width: 100%;
+            max-width: 900px; /* Maximum width for the dashboard content */
+            color: #1f2937; /* Dark text for content inside the white card */
+            margin-left: auto; /* Center the dashboard content area */
+            margin-right: auto; /* Center the dashboard content area */
+            margin-top: 1rem; /* Space below the user info bar */
+        }
+
+        /* Order sections within dashboard (this is the order page itself) */
+        #mtn-order-placement-section,
+        #at-order-placement-section,
+        #telecel-order-placement-section,
+        #retailer-stats-section,
+        #afa-bundle-retailer-section,
+        #account-settings-section {
+            background-color: #f9fafb; /* Light background for content sections */
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem; /* Padding inside the order section */
+            margin-top: 1.5rem; /* Space between the tab buttons and the previous section */
+        }
+
+
+        /* Adjust card within dashboard to be centered and have a max-width */
+        /* These styles are now largely handled by #dashboard-content-area and the individual sections */
+        #order-placement-section, #account-settings-section {
+             /* max-width and margin-left/right removed as they are now full width of #dashboard-content-area */
+        }
+        /* Styling for the individual stat cards in My Orders section */
+        .stat-card {
+            background-color: #ffffff;
+            padding: 1.2rem; /* Slightly reduced padding */
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column; /* Stack label and value */
+            align-items: flex-start;
+            justify-content: center;
+            gap: 0.5rem; /* Space between value and label */
+        }
+        .stat-card p {
+            margin: 0;
+            line-height: 1; /* Tighter line height */
+        }
+        .stat-card .stat-value {
+            font-size: 1.75rem; /* text-2xl from 3xl */
+            font-weight: 700; /* font-bold */
+        }
+        .stat-card .stat-label {
+            font-size: 0.8rem; /* text-xs from sm */
+            color: #6b7280; /* gray-500 */
+            text-transform: uppercase; /* Make labels uppercase */
+            letter-spacing: 0.05em; /* Slightly spaced out */
+        }
+        /* Updated submit button for login page to match image */
+        .submit-button {
+            background-color: #000000; /* Black */
+            color: #ffffff; /* White */
+            padding: 0.75rem 1.5rem; /* Adjusted padding */
+            border-radius: 0.5rem; /* Slightly more rounded */
+            font-weight: 700; /* Bold */
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border: none; /* Ensure no border */
+            cursor: pointer;
+        }
+        .submit-button:hover {
+            background-color: #1a1a1a; /* Slightly lighter black on hover */
+            transform: translateY(-1px);
+        }
+        /* Status colors for customer dashboard */
+        .status-submitted { color: #f59e0b; } /* Amber, previously for pending, now for submitted */
+        .status-processing { color: #3b82f6; } /* Blue */
+        .status-delivered { color: #10b981; } /* Green */
+        .status-cancelled { color: #ef4444; } /* Red */
+        .status-unknown { color: #6b7280; } /* Gray */
+
+        /* Mobile-specific font size adjustments for auth-title */
+        #auth-title {
+            font-size: 2rem; /* text-2xl for mobile */
+        }
+        @media (min-width: 768px) {
+            #auth-title {
+                font-size: 3rem; /* text-3xl for desktop */
+            }
+        }
+
+        /* Style for password input container to position the toggle button */
+        .password-input-container {
+            position: relative;
+            width: 100%;
+        }
+
+        /* Style for the password toggle button */
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #6b7280; /* gray-500 */
+            font-size: 1rem;
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+            transition: color 0.2s ease-in-out;
+        }
+
+        .password-toggle:hover {
+            color: #1f2937; /* Darker gray on hover */
+        }
+
+        /* Styles for individual order item in the form */
+        .single-order-item {
+            border: 1px solid #e2e8f0; /* Light gray border */
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem; /* Space between multiple order items */
+            background-color: #f8fafc; /* Very light background */
+            position: relative; /* For positioning remove button */
+        }
+
+        .remove-order-item-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: #ef4444; /* Red */
+            color: white;
+            border: none;
+            border-radius: 50%; /* Circular button */
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .remove-order-item-btn:hover {
+            background-color: #dc2626; /* Darker red */
+        }
+
+        /* Styles for the network display tab */
+        .network-display-tab {
+            background-color: #FFD700; /* MTN Yellow */
+            color: #1f2937; /* Dark text */
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1rem; /* Space below the tab */
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        /* FAQ Section Styles */
+        .faq-section {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin: 2rem auto; /* Center and provide vertical spacing */
+            max-width: 900px;
+            width: 90%; /* Responsive width */
+        }
+
+        .faq-item {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 0;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 0.75rem 0;
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600;
+            color: #1f2937;
+            cursor: pointer;
+            background: none;
+            border: none;
+            text-align: left;
+        }
+
+        .faq-question .icon {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .faq-question.active .icon {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+            padding: 0 0.75rem; /* Indent the answer */
+            color: #4a5568;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .faq-answer.open {
+            max-height: 500px; /* Adjust as needed to fit content */
+            padding-top: 0.5rem;
+            padding-bottom: 1rem;
+        }
+
+        /* Styles for the main FAQ toggle */
+        #main-faq-toggle-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            background-color: #FFD700; /* MTN Yellow */
+            color: #1f2937; /* Dark text */
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.25rem; /* text-xl */
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border: none;
+            cursor: pointer;
+            margin-bottom: 1.5rem; /* Space below the button */
+        }
+
+        #main-faq-toggle-button:hover {
+            background-color: #FFC000;
+            transform: translateY(-2px);
+        }
+
+        #main-faq-toggle-button .icon {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        #main-faq-toggle-button.active .icon {
+            transform: rotate(180deg);
+        }
+
+        #main-faq-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.7s ease-in-out;
+        }
+
+        #main-faq-content.open {
+            max-height: 1000px; /* Large enough to contain all FAQ items */
+        }
+
+        /* New Accordion Styles for AFA Bundle Section */
+        .afa-accordion-item {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0.5rem 0;
+        }
+
+        .afa-accordion-item:last-child {
+            border-bottom: none;
+        }
+
+        .afa-accordion-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 0.75rem 0;
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600;
+            color: #1f2937;
+            cursor: pointer;
+            background: none;
+            border: none;
+            text-align: left;
+        }
+
+        .afa-accordion-toggle .icon {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .afa-accordion-toggle.active .icon {
+            transform: rotate(180deg);
+        }
+
+        .afa-accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+            padding: 0 0.75rem; /* Indent the answer */
+            color: #4a5568;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .afa-accordion-content.open {
+            max-height: 500px; /* Adjust as needed to fit content */
+            padding-top: 0.5rem;
+            padding-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="main-navbar py-4 px-4 sm:px-6 lg:px-8">
+        <div class="container mx-auto flex items-center justify-between relative">
+            <div class="flex items-center">
+                <a href="https://i.imgur.com/Sede46z.jpeg" target="_blank" class="flex items-center">
+                    <img src="https://i.imgur.com/Sede46z.jpeg" alt="BD TECH SOLUTIONS Logo" class="h-12 w-auto mr-3 rounded-full">
+                </a>
+                <div class="flex flex-col items-start ml-3">
+                    <span class="logo-text">BD TECH SOLUTIONS</span>
+                    <span class="slogan-text">YOUR LINK TO THE DIGITAL WORLD</span>
+                </div>
+            </div>
+            <button id="mobile-menu-button" aria-label="Open menu">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7">
+                    <path fill-rule="evenodd" d="M3 6.75A.75.75 0 013.75 6h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 6.75zM3 12a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 12zm0 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            <!-- Mobile menu now inside this container -->
+            <div id="mobile-menu" class="hidden">
+                <a href="#" id="mobile-dashboard-link">Dashboard</a>
+                <a href="#" id="mobile-mtn-data-link">MTN DATA</a>
+                <a href="#" id="mobile-at-data-link">AT DATA</a>
+                <a href="#" id="mobile-telecel-data-link">TELECEL DATA</a>
+                <a href="#" id="mobile-afa-bundle-retailer-link">AFA Call Bundle</a>
+                <a href="#" id="mobile-account-settings-link">Account Settings</a>
+                <a href="#" id="mobile-contact-link">Contact Support</a>
+                <a href="https://chat.whatsapp.com/JZhLLboZmW9FjxcimGtZuX" target="_blank">Join our community</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Agent Message Display styling -->
+    <div id="agent-message-container">
+        <span>Please reach out to <a href="mailto:bdnetworksolutions01@gmail.com" class="font-bold underline text-blue-800 hover:text-blue-600">bdnetworksolutions01@gmail.com</a> via Gmail.</span>
+    </div>
+
+    <div id="pre-login-section">
+        <div class="hero-section">
+            <div class="hero-overlay"></div>
+            <div class="hero-content-wrapper container mx-auto flex flex-col md:flex-row items-center md:items-start justify-center gap-8 px-4 sm:px-6 lg:px-8">
+                <div class="hero-text-content md:w-1/2 lg:w-2/5 text-center md:text-left mb-8 md:mb-0">
+                    <h1 class="text-white">Empower Your Sales: Manage Data & AFA Bundles Seamlessly</h1>
+                    <p class="text-white">As a BD TECH SOLUTIONS retailer, effortlessly buy and sell data bundles and AFA Call Bundles to your clients.</p>
+                </div>
+                <div class="max-w-md w-full md:w-1/2 lg:w-2/5 card" id="auth-section">
+                    <div>
+                        <h2 class="mt-6 text-center text-3xl font-extrabold" id="auth-title">
+                            Retailer Sign In
+                        </h2>
+                    </div>
+
+                    <div class="relative my-6">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-2 bg-white text-gray-500">Sign in with Email</span>
+                        </div>
+                    </div>
+
+                    <form class="space-y-4 md:space-y-6" id="signInForm">
+                        <div>
+                            <label for="signin-email" class="sr-only">Email Address</label>
+                            <input id="signin-email" name="email" type="email" autocomplete="email" required
+                                   class="appearance-none relative block w-full input-field"
+                                   placeholder="Email">
+                        </div>
+                        <div class="password-input-container">
+                            <label for="signin-password" class="sr-only">Password</label>
+                            <input id="signin-password" name="password" type="password" autocomplete="current-password" required
+                                   class="appearance-none relative block w-full input-field"
+                                   placeholder="Password">
+                            <button type="button" id="toggle-signin-password" class="password-toggle" aria-label="Show password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input id="remember-me" name="remember-me" type="checkbox"
+                                       class="h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-gray-300 rounded">
+                                <label for="remember-me" class="ml-2 block text-sm">
+                                    Remember me
+                                </label>
+                            </div>
+                            <div class="text-sm">
+                                <a href="#" id="forgot-password-link" class="font-medium text-yellow-600 hover:text-yellow-500">
+                                    Forgot Password?
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <button type="submit"
+                                    class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md submit-button">
+                                LOGIN
+                            </button>
+                        </div>
+                    </form>
+
+                    <p class="mt-4 text-center text-sm" id="auth-subtitle">
+                        Not a Retailer yet? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signup">Register Here</span>
+                    </p>
+
+                    <form class="space-y-4 md:space-y-6 hidden" id="signUpForm">
+                        <div>
+                            <label for="signup-name" class="sr-only">Your Name</label>
+                            <input id="signup-name" name="name" type="text" required
+                                   class="appearance-none relative block w-full input-field"
+                                   placeholder="Your Name">
+                        </div>
+                        <div>
+                            <label for="signup-email" class="sr-only">Email Address</label>
+                            <input id="signup-email" name="email" type="email" autocomplete="email" required
+                                   class="appearance-none relative block w-full input-field"
+                                   placeholder="Email Address">
+                        </div>
+                        <div class="password-input-container">
+                            <label for="signup-password" class="sr-only">Password</label>
+                            <input id="signup-password" name="password" type="password" autocomplete="new-password" required
+                                   class="appearance-none relative block w-full input-field"
+                                   placeholder="Password">
+                            <button type="button" id="toggle-signup-password" class="password-toggle" aria-label="Show password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="password-input-container">
+                            <label for="signup-confirm-password" class="sr-only">Confirm Password</label>
+                            <input id="signup-confirm-password" name="confirmPassword" type="password" autocomplete="new-password" required
+                                   class="appearance-none relative block w-full input-field"
+                                   placeholder="Confirm Password">
+                            <button type="button" id="toggle-signup-confirm-password" class="password-toggle" aria-label="Show password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="mt-6">
+                            <button type="submit"
+                                    class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md submit-button">
+                                Register
+                            </button>
+                        </div>
+                    </form>
+
+                    <form class="space-y-4 md:space-y-6 hidden" id="forgotPasswordForm">
+                        <div>
+                            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                                Reset Password
+                            </h2>
+                            <p class="mt-2 text-center text-sm text-gray-600">
+                                Enter your email address to receive a password reset link.
+                            </p>
+                        </div>
+                        <div>
+                            <label for="reset-email" class="sr-only">Email Address</label>
+                            <input id="reset-email" name="email" type="email" autocomplete="email" required
+                                   class="appearance-none relative block w-full input-field"
+                                   placeholder="Email Address">
+                        </div>
+                        <div class="mt-6">
+                            <button type="submit"
+                                    class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md submit-button">
+                                Send Reset Link
+                            </button>
+                        </div>
+                        <div class="text-center text-sm mt-4">
+                            <a href="#" id="back-to-signin-link" class="font-medium text-yellow-600 hover:text-yellow-500">
+                                Back to Sign In
+                            </a>
+                        </div>
+                    </form>
+
+                    <div id="message-box" class="hidden message-box info"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Frequently Asked Questions Section -->
+        <section class="faq-section">
+            <button id="main-faq-toggle-button">
+                <span>Frequently Asked Questions (FAQ) - Retailers</span>
+                <i class="fas fa-chevron-down icon"></i>
+            </button>
+            <div id="main-faq-content">
+                <div class="faq-item">
+                    <button class="faq-question">
+                        How do I track my sales and client numbers?
+                        <i class="fas fa-chevron-down icon"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Your dashboard provides real-time statistics on total orders, total clients, and total sales. Simply navigate to the 'Dashboard' tab.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Can I place orders for different networks?
+                        <i class="fas fa-chevron-down icon"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes, you can now purchase bundles for MTN, AirtelTigo, and Telecel networks from the 'Buy Data' section.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        What are the benefits of selling AFA Call Bundles?
+                        <i class="fas fa-chevron-down icon"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>AFA Call Bundles offer attractive commissions and expand your product offerings. Details on purchasing and benefits are available in the 'AFA Call Bundle' section.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        What times can I process orders?
+                        <i class="fas fa-chevron-down icon"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>You can process orders at any time. Our active working hours are 8 AM to 8 PM, Monday to Saturday. Orders placed outside these hours will still be delivered in due time. Thank you</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="main-app-section" class="flex flex-col flex-grow items-center w-full px-4 sm:px-6 lg:px-8 py-8" style="display: none;">
+        <div class="container mx-auto dashboard-content-wrapper">
+            <div class="user-info-bar mb-8">
+                <span id="user-display"></span>
+                <button id="signOutButton">Sign Out</button>
+            </div>
+
+            <div id="dashboard-content-area">
+                <div class="dashboard-nav-buttons grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+                    <button id="dashboard-main-btn" class="active">
+                        <i class="fas fa-th-large"></i> <span>Dashboard</span>
+                    </button>
+                    <button id="mtn-order-placement-btn">
+                        <i class="fas fa-wifi"></i> <span>MTN DATA</span>
+                    </button>
+                    <button id="at-order-placement-btn">
+                        <i class="fas fa-broadcast-tower"></i> <span>AT DATA</span>
+                    </button>
+                    <button id="telecel-order-placement-btn">
+                        <i class="fas fa-mobile-alt"></i> <span>TELECEL DATA</span>
+                    </button>
+                    <button id="afa-bundle-retailer-btn">
+                        <i class="fas fa-phone-alt"></i> <span>AFA Call Bundle</span>
+                    </button>
+                    <button id="account-settings-btn">
+                        <i class="fas fa-user-cog"></i> <span>Account</span>
+                    </button>
+                </div>
+
+                <!-- Section for displaying Retailer Statistics (now the main Dashboard view) -->
+                <section id="retailer-stats-section">
+                    <div class="p-6 md:p-8">
+                        <h2 class="text-2xl font-bold mb-6 text-center">Retailer Dashboard Overview</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="stat-card">
+                                <p class="stat-label">Total Orders</p>
+                                <p class="stat-value" id="total-orders">0</p>
+                            </div>
+                            <div class="stat-card">
+                                <p class="stat-label">Total Clients</p>
+                                <p class="stat-value text-blue-600" id="total-clients">0</p>
+                            </div>
+                            <div class="stat-card">
+                                <p class="stat-label">Total Sales</p>
+                                <p class="stat-value text-green-600" id="total-sales">GHS 0.00</p>
+                            </div>
+                        </div>
+
+                        <button id="toggle-orders-display" class="submit-button mt-4 w-full py-2 px-4 rounded-md text-sm font-medium shadow-md transition-all duration-200 ease-in-out hover:shadow-lg">
+                            Order History
+                        </button>
+
+                        <div id="orders-list" class="space-y-4 mt-6 hidden"> <p class="text-gray-600 text-center" id="no-orders-message">No orders placed yet.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- MTN Data Order Section (Now uses dynamic item adding) -->
+                <section id="mtn-order-placement-section" class="hidden">
+                    <div id="mtn-order-details-step" class="p-6 md:p-8">
+                        <h3 class="mt-6 text-center text-2xl font-extrabold text-black mb-6">
+                            MTNUP2U DATA BUNDLE
+                        </h3>
+                        <p class="mt-2 text-center text-sm text-gray-600">
+                            Fill in client details to place MTN data order.
+                        </p>
+                        <form class="mt-8 space-y-6" id="mtnOrderForm">
+                            <!-- Container for multiple order items -->
+                            <div id="mtn-order-items-container">
+                                <!-- Initial order item will be added by JavaScript -->
+                            </div>
+
+                            <button type="button" id="add-another-mtn-order-btn" class="submit-button w-full py-2 px-4 rounded-md text-sm font-medium shadow-md transition-all duration-200 ease-in-out hover:shadow-lg mt-4">
+                                Add Another MTN Order
+                            </button>
+
+                            <div class="mt-6 text-right">
+                                <p class="text-lg font-bold">Total Amount: <span id="mtn-total-order-amount">GHS 0.00</span></p>
+                            </div>
+
+                            <div>
+                                <button type="submit"
+                                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md submit-button">
+                                    Proceed to Payment
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- AirtelTigo Data Order Section -->
+                <section id="at-order-placement-section" class="hidden">
+                    <div id="at-order-details-step" class="p-6 md:p-8">
+                        <h3 class="mt-6 text-center text-2xl font-extrabold text-black mb-6">
+                            AIRTEL TIGO DATA BUNDLE
+                        </h3>
+                        <p class="mt-2 text-center text-sm text-gray-600">
+                            Fill in client details to place AirtelTigo data order.
+                        </p>
+                        <form class="mt-8 space-y-6" id="atOrderForm">
+                            <!-- Container for multiple order items -->
+                            <div id="at-order-items-container">
+                                <!-- Initial order item will be added by JavaScript -->
+                            </div>
+
+                            <button type="button" id="add-another-at-order-btn" class="submit-button w-full py-2 px-4 rounded-md text-sm font-medium shadow-md transition-all duration-200 ease-in-out hover:shadow-lg mt-4">
+                                Add Another AT Order
+                            </button>
+
+                            <div class="mt-6 text-right">
+                                <p class="text-lg font-bold">Total Amount: <span id="at-total-order-amount">GHS 0.00</span></p>
+                            </div>
+
+                            <div>
+                                <button type="submit"
+                                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md submit-button">
+                                    Proceed to Payment
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Telecel Data Order Section -->
+                <section id="telecel-order-placement-section" class="hidden">
+                    <div id="telecel-order-details-step" class="p-6 md:p-8">
+                        <h3 class="mt-6 text-center text-2xl font-extrabold text-black mb-6">
+                            TELECEL DATA BUNDLE
+                        </h3>
+                        <p class="mt-2 text-center text-sm text-gray-600">
+                            Fill in client details to place Telecel data order.
+                        </p>
+                        <form class="mt-8 space-y-6" id="telecelOrderForm">
+                            <!-- Container for multiple order items -->
+                            <div id="telecel-order-items-container">
+                                <!-- Initial order item will be added by JavaScript -->
+                            </div>
+
+                            <button type="button" id="add-another-telecel-order-btn" class="submit-button w-full py-2 px-4 rounded-md text-sm font-medium shadow-md transition-all duration-200 ease-in-out hover:shadow-lg mt-4">
+                                Add Another Telecel Order
+                            </button>
+
+                            <div class="mt-6 text-right">
+                                <p class="text-lg font-bold">Total Amount: <span id="telecel-total-order-amount">GHS 0.00</span></p>
+                            </div>
+
+                            <div>
+                                <button type="submit"
+                                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md submit-button">
+                                    Proceed to Payment
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+
+                <!-- New AFA Call Bundle Section for Retailer -->
+                <section id="afa-bundle-retailer-section" class="hidden">
+                    <div class="p-6 md:p-8">
+                        <div class="afa-accordion-item">
+                            <button class="afa-accordion-toggle" id="afa-purchase-toggle">
+                                How to Purchase MTN AFA Bundle for your Client after Registration
+                                <i class="fas fa-chevron-down icon"></i>
+                            </button>
+                            <div class="afa-accordion-content" id="afa-purchase-content">
+                                <ol class="list-decimal list-inside space-y-1">
+                                    <li>Instruct your client to dial *1848#</li>
+                                    <li>Client selects option 1 to Buy AFA bundle</li>
+                                    <li>Client chooses (Monthly no data bundle)</li>
+                                    <li>Client selects option to Confirm</li>
+                                    <li>Client enters MoMo PIN and approves payment for the service</li>
+                                    <li>Client will receive both SMS notifications from MTN and MoMo.</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <div class="afa-accordion-item mt-4">
+                            <button class="afa-accordion-toggle" id="afa-benefits-toggle">
+                                Benefits of AFA Bundle for your Clients
+                                <i class="fas fa-chevron-down icon"></i>
+                            </button>
+                            <div class="afa-accordion-content" id="afa-benefits-content">
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li>250 minutes to MTN numbers</li>
+                                    <li>30 minutes to other networks</li>
+                                    <li>500 minutes to other registered AFA numbers</li>
+                                    <li>SMS to all networks</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold mb-2 mt-8 text-center uppercase">REGISTER CLIENT'S NUMBER</h3>
+                        <form id="afaRegistrationRetailerForm" class="space-y-6">
+                            <div>
+                                <label for="afa-retailer-full-name" class="block text-sm font-medium text-gray-700 mb-1">Client Full Name<span class="text-red-500">*</span>: </label>
+                                <input type="text" id="afa-retailer-full-name" name="fullName" class="input-field block w-full" placeholder="Evelyn Esi Gyamfi" required>
+                            </div>
+                            <div>
+                                <label for="afa-retailer-ghana-card" class="block text-sm font-medium text-gray-700 mb-1">Client Ghana Card Number<span class="text-red-500">*</span>: </label>
+                                <input type="text" id="afa-retailer-ghana-card" name="ghanaCard" class="input-field block w-full" placeholder="GHA-000000000-0" required>
+                            </div>
+                            <!-- NEW: Phone Number Input for AFA Retailer Registration -->
+                            <div>
+                                <label for="afa-retailer-phone-number" class="block text-sm font-medium text-gray-700 mb-1">Client Phone Number<span class="text-red-500">*</span>: </label>
+                                <input type="tel" id="afa-retailer-phone-number" name="phoneNumber" class="input-field block w-full" placeholder="e.g., 0535905900" required>
+                            </div>
+                            <div>
+                                <label for="afa-retailer-dob" class="block text-sm font-medium text-gray-700 mb-1">Client Date of Birth<span class="text-red-500">*</span>: </label>
+                                <input type="text" id="afa-retailer-dob" name="dob" class="input-field block w-full" placeholder="e.g., 10th March 1957" required>
+                            </div>
+                            <div>
+                                <label for="afa-retailer-location" class="block text-sm font-medium text-gray-700 mb-1">Client Location<span class="text-red-500">*</span>: </label>
+                                <input type="text" id="afa-retailer-location" name="location" class="input-field block w-full" placeholder="e.g., Kasoa, Central Region" required>
+                            </div>
+                            <div>
+                                <label for="afa-retailer-occupation" class="block text-sm font-medium text-gray-700 mb-1">Client Occupation<span class="text-red-500">*</span>: </label>
+                                <input type="text" id="afa-retailer-occupation" name="occupation" class="input-field block w-full" placeholder="e.g., Farmer" required>
+                            </div>
+                            <button type="submit" class="submit-button w-full py-2 px-4 rounded-md text-sm font-medium shadow-md transition-all duration-200 ease-in-out hover:shadow-lg">
+                                Register Client for AFA Bundle (GHS 10.00)
+                            </button>
+                        </form>
+                        <div id="afa-retailer-message-box" class="message-box info hidden mt-4"></div>
+                    </div>
+                </section>
+
+
+                <section id="account-settings-section" class="hidden">
+                    <div class="p-6 md:p-8">
+                        <h2 class="text-2xl font-bold mb-6 text-center">Account Settings</h2>
+
+                        <form id="profile-edit-form" class="space-y-6 mb-8">
+                            <h3 class="text-xl font-semibold mb-4">Edit Profile Information</h3>
+                            <div>
+                                <label for="profile-name" class="block text-sm font-medium text-gray-700 mb-1">Full Name<span class="text-red-500">*</span>:</label>
+                                <input type="text" id="profile-name" name="name" class="input-field block w-full">
+                            </div>
+                            <div>
+                                <label for="profile-email" class="block text-sm font-medium text-gray-700 mb-1">Email Address<span class="text-red-500">*</span>:</label>
+                                <input type="email" id="profile-email" name="email" class="input-field block w-full">
+                            </div>
+                            <div>
+                                <label for="profile-phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number<span class="text-red-500">*</span>:</label>
+                                <input type="tel" id="profile-phone" name="phone" class="input-field block w-full">
+                            </div>
+                            <button type="submit" class="submit-button w-full py-2 px-4 rounded-md text-sm font-medium shadow-md transition-all duration-200 ease-in-out hover:shadow-lg">
+                                Update Profile
+                            </button>
+                        </form>
+
+                        <form id="password-change-form" class="space-y-6">
+                            <h3 class="text-xl font-semibold mb-4">Change Password</h3>
+                            <div>
+                                <label for="current-password" class="block text-sm font-medium text-gray-700 mb-1">Current Password<span class="text-red-500">*</span>:</label>
+                                <input type="password" id="current-password" name="currentPassword" class="input-field block w-full" required>
+                            </div>
+                            <div>
+                                <label for="new-password" class="block text-sm font-medium text-gray-700 mb-1">New Password<span class="text-red-500">*</span>:</label>
+                                <input type="password" id="new-password" name="newPassword" class="input-field block w-full" required>
+                            </div>
+                            <div>
+                                <label for="confirm-new-password" class="block text-sm font-medium text-gray-700 mb-1">Confirm New Password<span class="text-red-500">*</span>:</label>
+                                <input type="password" id="confirm-new-password" name="confirmNewPassword" class="input-field block w-full" required>
+                            </div>
+                            <button type="submit" class="submit-button w-full py-2 px-4 rounded-md text-sm font-medium shadow-md transition-all duration-200 ease-in-out hover:shadow-lg">
+                                Change Password
+                            </button>
+                        </form>
+                        <div id="account-message-box" class="message-box info hidden mt-4"></div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template for a single order item to be cloned by JavaScript -->
+    <template id="order-item-template">
+        <div class="single-order-item space-y-4">
+            <button type="button" class="remove-order-item-btn" aria-label="Remove order item">X</button>
+            <div class="network-display-tab flex items-center justify-center p-2 rounded-md bg-gray-200 text-gray-700 font-semibold mb-2">
+                <span id="network-name-display"></span>
+            </div>
+            <div class="server-type-container"> <!-- Added container for conditional display -->
+                <label for="server-type" class="sr-only">Server Type</label>
+                <select id="server-type" name="serverType"
+                        class="appearance-none relative block w-full input-field">
+                    <option value="" disabled selected>Select Server (A: Normal, B: Faster)</option>
+                    <option value="serverA">Server A (Normal Delivery)</option>
+                    <option value="serverB">Server B (Faster Delivery)</option>
+                </select>
+            </div>
+            <div>
+                <label for="contact-number" class="sr-only">Contact Number</label>
+                <input id="contact-number" name="contactNumber" type="tel" required
+                       class="appearance-none relative block w-full input-field"
+                       placeholder="Contact Number (e.g., 0531323296)">
+            </div>
+            <div>
+                <label for="data-size" class="sr-only">Data Size</label>
+                <select id="data-size" name="dataSize" required
+                        class="appearance-none relative block w-full input-field">
+                    <option value="" disabled selected>Select Data Size</option>
+                    <!-- Options will be dynamically populated here with prices -->
+                </select>
+            </div>
+            <div>
+                <label for="amount" class="sr-only">Amount</label>
+                <input id="amount" name="amount" type="text" readonly
+                       class="appearance-none relative block w-full input-field"
+                       placeholder="Amount (Ghc)" value="">
+            </div>
+        </div>
+    </template>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script> <!-- Added Firestore -->
+
+    <script>
+        // Your Firebase project configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyByXcxgxh86rOXuX-j1xmeAl9NVyPa85NA",
+            authDomain: "bd-network-5b70e.firebaseapp.com",
+            projectId: "bd-network-5b70e",
+            storageBucket: "bd-network-5b70e.firebasestorage.app",
+            messagingSenderId: "284926879983",
+            appId: "1:284926879983:web:9aa2555471d123d0cc931a"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore(); // Initialize Firestore
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // MTN Prices with Server A and Server B options
+            const mtnRawPrices = {
+                "1GB": { "serverA": 4.60, "serverB": 5.60 },
+                "2GB": { "serverA": 9.50, "serverB": 11.50 },
+                "3GB": { "serverA": 13.50, "serverB": 15.50 },
+                "4GB": { "serverA": 18.00, "serverB": 22.00 },
+                "5GB": { "serverA": 22.20, "serverB": 25.50 },
+                "6GB": { "serverA": 27.00, "serverB": 33.00 },
+                "7GB": { "serverA": null, "serverB": null }, // Existing, keep as is
+                "8GB": { "serverA": 36.00, "serverB": 40.50 },
+                "10GB": { "serverA": 43.00, "serverB": 47.00 },
+                "15GB": { "serverA": 63.00, "serverB": 70.00 },
+                "20GB": { "serverA": 83.00, "serverB": 95.00 },
+                "25GB": { "serverA": 102, "serverB": 115.00 }, // Existing, keep as is
+                "30GB": { "serverA": 122.00, "serverB": 135.00 },
+                "50GB": { "serverA": null, "serverB": null } // 50GB removed from Server B
+            };
+
+            // AirtelTigo Prices (single server) - unchanged from previous update
+            const atRawPrices = {
+                "1GB": 5.00, "2GB": 10.00, "3GB": 15.00, "4GB": 19.00,
+                "5GB": 24.00, "6GB": 29.00, "8GB": 38.00, "10GB": 46.00,
+                "15GB": 70.00, "20GB": 90.00, "25GB": 102.00, "30GB": 120.00,
+                "40GB": 150.00, "50GB": 180.00, "200GB": 425.00
+            };
+
+            // Telecel Prices (single server) - unchanged from previous update
+            const telecelRawPrices = {
+                "5GB": 24.00,
+                "10GB": 46.00,
+                "15GB": 65.00,
+                "20GB": 85.00, "25GB": 117.00, "30GB": 127.00,
+                "35GB": null, "40GB": 165.00, "45GB": null
+            };
+
+            // Helper to convert raw prices to bundle objects for a specific server (MTN only)
+            function createBundlesForServer(rawPrices, serverType) {
+                return Object.keys(rawPrices)
+                    .filter(size => rawPrices[size][serverType] !== null) // Filter out null prices for a given server
+                    .map(size => {
+                        const price = rawPrices[size][serverType];
+                        return { "size": size, "price": price, "validity": "30 days" };
+                    });
+            }
+
+            // Helper to convert raw prices to bundle objects for single-server networks
+            function createSingleServerBundles(rawPrices) {
+                return Object.keys(rawPrices).map(size => {
+                    const price = rawPrices[size];
+                    return { "size": size, "price": price, "validity": "30 days" };
+                });
+            }
+
+            // Consolidated dataBundles object
+            const allDataBundles = {
+                "MTN": {
+                    "serverA": createBundlesForServer(mtnRawPrices, "serverA"),
+                    "serverB": createBundlesForServer(mtnRawPrices, "serverB")
+                },
+                "AirtelTigo": createSingleServerBundles(atRawPrices),
+                "Telecel": createSingleServerBundles(telecelRawPrices)
+            };
+
+            // Lookups for easy price retrieval by size, network, and server type
+            const bundlePricesLookup = {
+                "MTN": { "serverA": {}, "serverB": {} },
+                "AirtelTigo": {},
+                "Telecel": {}
+            };
+
+            // Populate the lookup tables for MTN
+            ["serverA", "serverB"].forEach(serverType => {
+                allDataBundles["MTN"][serverType].forEach(bundle => {
+                    bundlePricesLookup["MTN"][serverType][bundle.size] = bundle.price;
+                });
+            });
+
+            // Populate the lookup tables for AirtelTigo and Telecel (single level)
+            allDataBundles["AirtelTigo"].forEach(bundle => { bundlePricesLookup["AirtelTigo"][bundle.size] = bundle.price; });
+            allDataBundles["Telecel"].forEach(bundle => { bundlePricesLookup["Telecel"][bundle.size] = bundle.price; });
+
+
+            // Data storage for order and user
+            let collectedOrderData = {};
+            let currentUserUid = null;
+            let registeredUserName = '';
+            let registeredUserEmail = '';
+            let registeredUserPhone = '';
+            let retailerClients = new Set(); // To store unique client phone numbers for retailer
+            let retailerTotalSales = 0; // To store total sales amount for retailer
+            let currentOrders = [];
+
+
+            // DOM Elements
+            const preLoginSection = document.getElementById('pre-login-section');
+            const mainAppSection = document.getElementById('main-app-section');
+            const signOutButton = document.getElementById('signOutButton');
+            const authSection = document.getElementById('auth-section');
+            const signInForm = document.getElementById('signInForm');
+            const signUpForm = document.getElementById('signUpForm');
+            const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+            const authTitle = document.getElementById('auth-title');
+            const authSubtitle = document.getElementById('auth-subtitle');
+            const messageBox = document.getElementById('message-box');
+
+            // Order Sections for each network
+            const mtnOrderForm = document.getElementById('mtnOrderForm');
+            const mtnOrderItemsContainer = document.getElementById('mtn-order-items-container');
+            const addAnotherMtnOrderBtn = document.getElementById('add-another-mtn-order-btn');
+            const mtnTotalOrderAmountSpan = document.getElementById('mtn-total-order-amount');
+
+            const atOrderForm = document.getElementById('atOrderForm');
+            const atOrderItemsContainer = document.getElementById('at-order-items-container');
+            const addAnotherAtOrderBtn = document.getElementById('add-another-at-order-btn');
+            const atTotalOrderAmountSpan = document.getElementById('at-total-order-amount');
+
+            const telecelOrderForm = document.getElementById('telecelOrderForm');
+            const telecelOrderItemsContainer = document.getElementById('telecel-order-items-container');
+            const addAnotherTelecelOrderBtn = document.getElementById('add-another-telecel-order-btn');
+            const telecelTotalOrderAmountSpan = document.getElementById('telecel-total-order-amount');
+
+
+            // Retailer Dashboard Navigation Buttons
+            const dashboardMainBtn = document.getElementById('dashboard-main-btn'); // New button
+            const mtnOrderPlacementBtn = document.getElementById('mtn-order-placement-btn');
+            const atOrderPlacementBtn = document.getElementById('at-order-placement-btn');
+            const telecelOrderPlacementBtn = document.getElementById('telecel-order-placement-btn');
+            const afaBundleRetailerBtn = document.getElementById('afa-bundle-retailer-btn'); // New AFA Bundle Button
+            const accountSettingsBtn = document.getElementById('account-settings-btn');
+
+            // Retailer Dashboard Sections
+            const retailerStatsSection = document.getElementById('retailer-stats-section');
+            const mtnOrderPlacementSection = document.getElementById('mtn-order-placement-section');
+            const atOrderPlacementSection = document.getElementById('at-order-placement-section');
+            const telecelOrderPlacementSection = document.getElementById('telecel-order-placement-section');
+            const afaBundleRetailerSection = document.getElementById('afa-bundle-retailer-section'); // New AFA Bundle Section
+            const accountSettingsSection = document.getElementById('account-settings-section');
+
+            // Retailer Dashboard Stat Displays
+            const userDisplay = document.getElementById('user-display');
+            const totalOrdersSpan = document.getElementById('total-orders');
+            const totalClientsSpan = document.getElementById('total-clients');
+            const totalSalesSpan = document.getElementById('total-sales');
+            const ordersList = document.getElementById('orders-list');
+            const noOrdersMessage = document.getElementById('no-orders-message');
+            const toggleOrdersDisplayButton = document.getElementById('toggle-orders-display');
+
+            const profileEditForm = document.getElementById('profile-edit-form');
+            const profileNameInput = document.getElementById('profile-name');
+            const profileEmailInput = document.getElementById('profile-email');
+            const profilePhoneInput = document.getElementById('profile-phone');
+            const passwordChangeForm = document.getElementById('password-change-form');
+            const currentPasswordInput = document.getElementById('current-password');
+            const newPasswordInput = document.getElementById('new-password');
+            const confirmNewPasswordInput = document.getElementById('confirm-new-password');
+            const accountMessageBox = document.getElementById('account-message-box');
+
+            const afaRegistrationRetailerForm = document.getElementById('afaRegistrationRetailerForm'); // AFA registration form
+            const afaRetailerMessageBox = document.getElementById('afa-retailer-message-box'); // AFA message box
+            const afaRetailerPhoneNumberInput = document.getElementById('afa-retailer-phone-number'); // New AFA retailer phone number input
+
+
+            // AFA Accordion elements
+            const afaPurchaseToggle = document.getElementById('afa-purchase-toggle');
+            const afaPurchaseContent = document.getElementById('afa-purchase-content');
+            const afaBenefitsToggle = document.getElementById('afa-benefits-toggle');
+            const afaBenefitsContent = document.getElementById('afa-benefits-content');
+
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileDashboardLink = document.getElementById('mobile-dashboard-link');
+            const mobileMtnDataLink = document.getElementById('mobile-mtn-data-link');
+            const mobileAtDataLink = document.getElementById('mobile-at-data-link');
+            const mobileTelecelDataLink = document.getElementById('mobile-telecel-data-link');
+            const mobileAfaBundleRetailerLink = document.getElementById('mobile-afa-bundle-retailer-link');
+            const mobileAccountSettingsLink = document.getElementById('mobile-account-settings-link');
+            const mobileContactLink = document.getElementById('mobile-contact-link');
+            const agentMessageContainer = document.getElementById('agent-message-container');
+
+            const forgotPasswordLink = document.getElementById('forgot-password-link');
+            const resetEmailInput = document.getElementById('reset-email');
+            const backToSignInLink = document.getElementById('back-to-signin-link');
+
+            // Template for cloning order items
+            const orderItemTemplate = document.getElementById('order-item-template');
+
+            // Main FAQ toggle elements
+            const mainFaqToggleButton = document.getElementById('main-faq-toggle-button');
+            const mainFaqContent = document.getElementById('main-faq-content');
+
+
+            let currentView = 'retailer-stats'; // Default view for retailer dashboard
+
+
+            // Helper functions for showing/hiding sections
+            function showMainApp(viewToDisplay = 'retailer-stats') {
+                preLoginSection.style.display = 'none';
+                mainAppSection.style.display = 'flex';
+                // Initially show the retailer stats overview or the last viewed section
+                switchRetailerDashboardView(viewToDisplay, false); // Don't push state on initial load
+                updateRetailerStats();
+                messageBox.classList.add('hidden');
+            }
+
+            function showAuthForms() {
+                mainAppSection.style.display = 'none';
+                preLoginSection.style.display = 'block';
+                userDisplay.textContent = '';
+                
+                currentUserUid = null;
+                currentOrders = []; // Clear orders on sign out
+                retailerClients = new Set(); // Clear clients on sign out
+                retailerTotalSales = 0; // Reset sales on sign out
+                registeredUserName = '';
+                registeredUserEmail = '';
+                registeredUserPhone = '';
+                
+                signInForm.classList.remove('hidden');
+                signUpForm.classList.add('hidden');
+                forgotPasswordForm.classList.add('hidden');
+                authTitle.textContent = 'Retailer Sign In';
+                authSubtitle.innerHTML = 'Not a Retailer yet? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signup">Register Here</span>';
+            }
+
+
+            // --- Firebase Auth State Change Listener ---
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    console.log('User state changed: Signed IN.', user.uid, user.email, user.displayName);
+                    currentUserUid = user.uid;
+                    registeredUserName = user.displayName || '';
+                    registeredUserEmail = user.email || '';
+                    // Load retailer specific data
+                    currentOrders = JSON.parse(localStorage.getItem(`userOrders_${currentUserUid}`)) || [];
+                    retailerClients = new Set(JSON.parse(localStorage.getItem(`retailerClients_${currentUserUid}`)) || []);
+                    retailerTotalSales = parseFloat(localStorage.getItem(`retailerTotalSales_${currentUserUid}`)) || 0;
+
+
+                    userDisplay.textContent = `Welcome, ${user.displayName || user.email}`;
+                    
+                    // Determine which view to display on auth state change
+                    let initialView = localStorage.getItem('lastRetailerView') || 'retailer-stats';
+                    const hashView = window.location.hash.substring(1); // Get view from URL hash
+                    if (hashView && document.getElementById(`${hashView}-section`)) { // Check if hash corresponds to a valid section
+                        initialView = hashView;
+                    }
+
+                    showMainApp(initialView); // Pass the determined view
+                    displayMessage('You are signed in!', 'success');
+                } else {
+                    console.log('User state changed: Signed OUT.');
+                    showAuthForms();
+                    displayMessage('Please sign in or sign up to place an order.', 'info');
+                    localStorage.removeItem('lastRetailerView'); // Clear last view on sign out
+                }
+            });
+
+
+            // --- Sign-in Form Submission ---
+            signInForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                console.log('Sign In form submitted.');
+                const email = document.getElementById('signin-email').value;
+                const password = document.getElementById('signin-password').value;
+                
+                const rememberMe = document.getElementById('remember-me').checked;
+                const persistence = rememberMe ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION;
+
+                displayMessage('Signing in...', 'info');
+                
+                try {
+                    await auth.setPersistence(persistence);
+                    await auth.signInWithEmailAndPassword(email, password);
+                    messageBox.classList.add('hidden');
+                } catch (error) {
+                    console.error("Sign In Error:", error);
+                    displayMessage(`Sign In Failed: ${error.message}`, 'error');
+                }
+            });
+            
+            // --- Sign-up Form Submission ---
+            signUpForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                registeredUserName = document.getElementById('signup-name').value;
+                registeredUserEmail = document.getElementById('signup-email').value;
+                registeredUserPhone = ''; // Phone number removed from signup form, clear it
+                const signupPassword = document.getElementById('signup-password').value;
+                const confirmPassword = document.getElementById('signup-confirm-password').value;
+
+                if (signupPassword !== confirmPassword) {
+                    displayMessage('Passwords do not match.', 'error');
+                    return;
+                }
+
+                displayMessage('Registering...', 'info');
+
+                try {
+                    const userCredential = await auth.createUserWithEmailAndPassword(registeredUserEmail, signupPassword);
+                    await userCredential.user.updateProfile({ displayName: registeredUserName });
+                    
+                    displayMessage('Registration successful! Please sign in using your new account.', 'success');
+                    signInForm.classList.remove('hidden');
+                    signUpForm.classList.add('hidden');
+                    forgotPasswordForm.classList.add('hidden');
+                    authTitle.textContent = 'Retailer Sign In';
+                    authSubtitle.innerHTML = 'Already a Retailer? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signin">Sign In</span>';
+                } catch (error) {
+                    console.error("Sign Up Error:", error);
+                    displayMessage(`Registration Failed: ${error.message}`, 'error');
+                }
+            });
+
+            // --- Logout Functionality ---
+            signOutButton.addEventListener('click', async () => {
+                try {
+                    await auth.signOut();
+                    console.log('Firebase Sign Out successful.');
+                } catch (error) {
+                    console.error('Firebase Sign Out Error:', error);
+                    displayMessage(`Sign Out Failed: ${error.message}`, 'error');
+                }
+            });
+
+            // --- Auth Toggle Functionality (Using Event Delegation) ---
+            authSection.addEventListener('click', (event) => {
+                const toggleLink = event.target.closest('.auth-toggle-link');
+                if (toggleLink) {
+                    const target = toggleLink.dataset.target;
+                    if (target === 'signup') {
+                        signInForm.classList.add('hidden');
+                        signUpForm.classList.remove('hidden');
+                        forgotPasswordForm.classList.add('hidden');
+                        authTitle.textContent = 'Retailer Registration';
+                        authSubtitle.innerHTML = 'Already a Retailer? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signin">Sign In</span>';
+                    } else if (target === 'signin') {
+                        signInForm.classList.remove('hidden');
+                        signUpForm.classList.add('hidden');
+                        forgotPasswordForm.classList.add('hidden');
+                        authTitle.textContent = 'Retailer Sign In';
+                        authSubtitle.innerHTML = 'Not a Retailer yet? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signup">Register Here</span>';
+                    }
+                    messageBox.classList.add('hidden');
+                }
+            });
+
+            // New: Forgot Password Link Click
+            forgotPasswordLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                signInForm.classList.add('hidden');
+                signUpForm.classList.add('hidden');
+                forgotPasswordForm.classList.remove('hidden');
+                authTitle.textContent = 'Reset Your Password';
+                authSubtitle.innerHTML = 'Enter your email to receive a reset link.';
+                messageBox.classList.add('hidden');
+            });
+
+            // New: Back to Sign In Link Click
+            backToSignInLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                signInForm.classList.remove('hidden');
+                signUpForm.classList.add('hidden');
+                forgotPasswordForm.classList.add('hidden');
+                authTitle.textContent = 'Retailer Sign In';
+                authSubtitle.innerHTML = 'Not a Retailer yet? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signup">Register Here</span>';
+                messageBox.classList.add('hidden');
+            });
+
+            // New: Forgot Password Form Submission (Real Firebase)
+            forgotPasswordForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const resetEmail = resetEmailInput.value.trim();
+                if (resetEmail) {
+                    displayMessage('Sending reset link...', 'info');
+                    try {
+                        await auth.sendPasswordResetEmail(resetEmail);
+                        displayMessage(`If an account with ${resetEmail} exists, a password reset link has been sent. Please check your inbox.`, 'success');
+                        resetEmailInput.value = '';
+                        setTimeout(() => {
+                            signInForm.classList.remove('hidden');
+                            signUpForm.classList.add('hidden');
+                            forgotPasswordForm.classList.add('hidden');
+                            authTitle.textContent = 'Retailer Sign In';
+                            authSubtitle.innerHTML = 'Not a Retailer yet? <span class="auth-toggle-link text-blue-600 hover:text-blue-800 cursor-pointer" data-target="signup">Register Here</span>';
+                            messageBox.classList.add('hidden');
+                        }, 5000);
+                    }
+                    catch (error) {
+                        console.error("Password Reset Error:", error);
+                        displayMessage(`Failed to send reset link: ${error.message}`, 'error');
+                    }
+                } else {
+                    displayMessage('Please enter your email address.', 'error');
+                }
+            });
+
+
+            function displayMessage(message, type) {
+                messageBox.textContent = message;
+                messageBox.className = `message-box ${type}`;
+                messageBox.classList.remove('hidden');
+            }
+            
+            function displayAccountMessage(message, type) {
+                accountMessageBox.textContent = message;
+                accountMessageBox.className = `message-box ${type}`;
+                accountMessageBox.classList.remove('hidden');
+            }
+
+            function displayAfaRetailerMessage(message, type) {
+                afaRetailerMessageBox.textContent = message;
+                afaRetailerMessageBox.className = `message-box ${type}`;
+                afaRetailerMessageBox.classList.remove('hidden');
+            }
+
+            // --- Dynamic Order Form Logic for MTN, AT, and Telecel ---
+            function addOrderItem(containerElement, networkType) {
+                const clone = orderItemTemplate.content.cloneNode(true);
+                const networkNameDisplay = clone.querySelector('#network-name-display'); // New element
+                const serverTypeSelect = clone.querySelector('[name="serverType"]');
+                const serverTypeContainer = clone.querySelector('.server-type-container'); // Get the container
+                const contactNumberInput = clone.querySelector('[name="contactNumber"]');
+                const dataSizeSelect = clone.querySelector('[name="dataSize"]');
+                const amountInput = clone.querySelector('[name="amount"]');
+                const removeButton = clone.querySelector('.remove-order-item-btn');
+
+                // Assign unique IDs to cloned elements and update labels
+                const currentCount = containerElement.children.length;
+                // No need for ID on network-select anymore as it's a display div
+                serverTypeSelect.id = `server-type-${networkType}-${currentCount}`;
+                serverTypeSelect.previousElementSibling.setAttribute('for', `server-type-${networkType}-${currentCount}`);
+                contactNumberInput.id = `contact-number-${networkType}-${currentCount}`;
+                contactNumberInput.previousElementSibling.setAttribute('for', `contact-number-${networkType}-${currentCount}`);
+                dataSizeSelect.id = `data-size-${networkType}-${currentCount}`;
+                dataSizeSelect.previousElementSibling.setAttribute('for', `data-size-${networkType}-${currentCount}`);
+                amountInput.id = `amount-${networkType}-${currentCount}`;
+                amountInput.previousElementSibling.setAttribute('for', `amount-${networkType}-${currentCount}`);
+
+                // Set the network display text
+                networkNameDisplay.textContent = networkType.toUpperCase(); // Display network name
+
+                // Conditionally show/hide server type dropdown
+                if (networkType === 'MTN') {
+                    serverTypeContainer.style.display = 'block'; // Show for MTN
+                    serverTypeSelect.required = true; // Make required for MTN
+                    serverTypeSelect.value = 'serverA'; // Default to Server A for MTN
+                    populateDataSizeOptions(dataSizeSelect, networkType, serverTypeSelect.value); // Populate for default server
+                    serverTypeSelect.addEventListener('change', () => {
+                        const selectedServer = serverTypeSelect.value;
+                        populateDataSizeOptions(dataSizeSelect, networkType, selectedServer);
+                        dataSizeSelect.value = ''; // Reset data size
+                        amountInput.value = ''; // Clear amount
+                        updateTotalAmount(containerElement, networkType);
+                    });
+                } else {
+                    serverTypeContainer.style.display = 'none'; // Hide for AT and Telecel
+                    serverTypeSelect.required = false; // Not required
+                    serverTypeSelect.value = ''; // Clear value
+                    populateDataSizeOptions(dataSizeSelect, networkType); // Populate without server type
+                }
+                
+                // Attach event listener for data size change on this new item
+                dataSizeSelect.addEventListener('change', () => {
+                    const selectedSize = dataSizeSelect.value;
+                    let price = 0;
+                    if (networkType === 'MTN') {
+                        const selectedServer = serverTypeSelect.value;
+                        if (selectedSize && selectedServer && bundlePricesLookup[networkType][selectedServer][selectedSize]) {
+                            price = bundlePricesLookup[networkType][selectedServer][selectedSize];
+                        }
+                    } else {
+                        if (selectedSize && bundlePricesLookup[networkType][selectedSize]) {
+                            price = bundlePricesLookup[networkType][selectedSize];
+                        }
+                    }
+                    amountInput.value = price > 0 ? price.toFixed(2) : '';
+                    updateTotalAmount(containerElement, networkType); // Recalculate total
+                });
+
+                // Attach event listener for remove button
+                removeButton.addEventListener('click', (event) => {
+                    event.target.closest('.single-order-item').remove();
+                    updateTotalAmount(containerElement, networkType); // Recalculate total
+                });
+
+                containerElement.appendChild(clone);
+                updateTotalAmount(containerElement, networkType); // Update total after adding a new item
+            }
+
+            function populateDataSizeOptions(selectElement, network, serverType = null) {
+                selectElement.innerHTML = '<option value="" disabled selected>Select Data Size</option>';
+                let bundles;
+                if (network === 'MTN' && serverType) {
+                    bundles = allDataBundles[network][serverType];
+                } else {
+                    bundles = allDataBundles[network];
+                }
+                
+                if (bundles) {
+                    bundles.forEach(bundle => {
+                        const option = document.createElement('option');
+                        option.value = bundle.size;
+                        option.textContent = `${bundle.size} - GHS ${bundle.price.toFixed(2)}`;
+                        selectElement.appendChild(option);
+                    });
+                }
+            }
+
+            function updateTotalAmount(containerElement, networkType) {
+                let total = 0;
+                const amountInputs = containerElement.querySelectorAll('[name="amount"]');
+                amountInputs.forEach(input => {
+                    const value = parseFloat(input.value);
+                    if (!isNaN(value)) {
+                        total += value;
+                    }
+                });
+                if (networkType === 'MTN') {
+                    mtnTotalOrderAmountSpan.textContent = `GHS ${total.toFixed(2)}`;
+                } else if (networkType === 'AirtelTigo') {
+                    atTotalOrderAmountSpan.textContent = `GHS ${total.toFixed(2)}`;
+                } else if (networkType === 'Telecel') {
+                    telecelTotalOrderAmountSpan.textContent = `GHS ${total.toFixed(2)}`;
+                }
+            }
+            
+            // Add initial order items for all forms
+            addOrderItem(mtnOrderItemsContainer, 'MTN');
+            addOrderItem(atOrderItemsContainer, 'AirtelTigo');
+            addOrderItem(telecelOrderItemsContainer, 'Telecel');
+
+
+            // Event listeners for "Add Another Order" buttons
+            addAnotherMtnOrderBtn.addEventListener('click', () => addOrderItem(mtnOrderItemsContainer, 'MTN'));
+            addAnotherAtOrderBtn.addEventListener('click', () => addOrderItem(atOrderItemsContainer, 'AirtelTigo'));
+            addAnotherTelecelOrderBtn.addEventListener('click', () => addOrderItem(telecelOrderItemsContainer, 'Telecel'));
+
+
+            // --- Order Form Submission (MTN, AT, and Telecel) ---
+            async function handleOrderSubmission(event, networkType) {
+                event.preventDefault();
+
+                if (!currentUserUid) {
+                    displayMessage('You must be signed in to place an order.', 'error');
+                    showAuthForms();
+                    return;
+                }
+
+                const containerElement = 
+                    networkType === 'MTN' ? mtnOrderItemsContainer :
+                    networkType === 'AirtelTigo' ? atOrderItemsContainer :
+                    telecelOrderItemsContainer;
+
+                const allOrderItems = containerElement.querySelectorAll('.single-order-item');
+                const ordersToProcess = [];
+                let totalPaymentAmount = 0;
+
+                allOrderItems.forEach((item, index) => {
+                    const contactNumber = item.querySelector('[name="contactNumber"]').value.trim();
+                    const dataSize = item.querySelector('[name="dataSize"]').value;
+                    const serverType = networkType === 'MTN' ? item.querySelector('[name="serverType"]').value : 'N/A'; // Get server type only for MTN
+                    const amount = parseFloat(item.querySelector('[name="amount"]').value);
+
+                    if (!contactNumber || !dataSize || isNaN(amount) || amount <= 0 || (networkType === 'MTN' && !serverType)) {
+                        displayMessage(`Please fill all details for order item ${index + 1}.`, 'error');
+                        ordersToProcess.length = 0;
+                        return;
+                    }
+
+                    ordersToProcess.push({
+                        type: 'data',
+                        network: networkType, // Dynamically set network
+                        bundleSize: dataSize,
+                        bundlePrice: amount,
+                        recipientPhone: contactNumber,
+                        serverType: serverType, // Include server type (N/A for AT/Telecel)
+                        customerDisplayName: registeredUserName || 'N/A',
+                        customerEmail: registeredUserEmail || 'guest@example.com',
+                        timestamp: new Date().toLocaleString(),
+                        userId: currentUserUid,
+                        status: 'Initiated'
+                    });
+                    totalPaymentAmount += amount;
+                });
+
+                if (ordersToProcess.length === 0) {
+                    displayMessage('No valid orders to process.', 'error');
+                    return;
+                }
+
+                displayMessage('Preparing payment. Please wait...', 'info');
+                console.log('--- Paystack Setup Details ---');
+                console.log('Customer Email:', registeredUserEmail);
+                console.log('Total Payment Amount (GHS):', totalPaymentAmount);
+                console.log('Total Payment Amount (kobo/pesewas):', totalPaymentAmount * 100);
+                console.log('Orders to Process:', ordersToProcess);
+                console.log('------------------------------');
+
+                const handler = PaystackPop.setup({
+                    key: 'pk_live_8e753f43f8defed950965395fc04f5dc7ab1035b',
+                    email: registeredUserEmail,
+                    amount: totalPaymentAmount * 100,
+                    currency: 'GHS',
+                    ref: `${networkType}_ORD_${Date.now()}`, // Unique reference
+                    firstname: registeredUserName.split(' ')[0] || '',
+                    lastname: registeredUserName.split(' ').slice(1).join(' ') || '',
+                    metadata: {
+                        custom_fields: [
+                            { display_name: "Customer ID", variable_name: "customer_id", value: currentUserUid },
+                            { display_name: "Orders Details", variable_name: "orders_details", value: JSON.stringify(ordersToProcess) }
+                        ]
+                    },
+                    callback: function(response){
+                        (async () => {
+                            const paymentReference = response.reference;
+                            console.log('Paystack Payment Successful. Reference:', paymentReference);
+                            
+                            switchRetailerDashboardView('retailer-stats'); // Go to dashboard after payment
+                            displayMessage('Payment successful! Your order has been placed and confirmed.', 'success');
+
+                            ordersToProcess.forEach(order => {
+                                const newOrder = {
+                                    id: `${networkType}_ORD` + Date.now() + '-' + Math.floor(Math.random() * 1000),
+                                    type: 'data',
+                                    network: order.network,
+                                    bundle: order.bundleSize,
+                                    price: order.bundlePrice,
+                                    phone: order.recipientPhone,
+                                    server: order.serverType, // Store server type
+                                    paymentReference: paymentReference,
+                                    date: new Date().toLocaleString(),
+                                    status: 'Submitted'
+                                };
+                                currentOrders.push(newOrder);
+
+                                // Update retailer specific stats
+                                if (!retailerClients.has(order.recipientPhone)) {
+                                    retailerClients.add(order.recipientPhone);
+                                }
+                                retailerTotalSales += order.bundlePrice;
+                            });
+                            localStorage.setItem(`userOrders_${currentUserUid}`, JSON.stringify(currentOrders));
+                            localStorage.setItem(`retailerClients_${currentUserUid}`, JSON.stringify(Array.from(retailerClients)));
+                            localStorage.setItem(`retailerTotalSales_${currentUserUid}`, retailerTotalSales.toFixed(2));
+
+                            updateRetailerStats();
+                            renderOrders(); // Re-render the orders list to show the new order
+
+                            // Reset the relevant form
+                            if (networkType === 'MTN') {
+                                mtnOrderItemsContainer.innerHTML = '';
+                                addOrderItem(mtnOrderItemsContainer, 'MTN');
+                                mtnTotalOrderAmountSpan.textContent = 'GHS 0.00';
+                            } else if (networkType === 'AirtelTigo') {
+                                atOrderItemsContainer.innerHTML = '';
+                                addOrderItem(atOrderItemsContainer, 'AirtelTigo');
+                                atTotalOrderAmountSpan.textContent = 'GHS 0.00';
+                            } else if (networkType === 'Telecel') {
+                                telecelOrderItemsContainer.innerHTML = '';
+                                addOrderItem(telecelOrderItemsContainer, 'Telecel');
+                                telecelTotalOrderAmountSpan.textContent = 'GHS 0.00';
+                            }
+                            
+                            const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5CR9JLoePMdRHIApsx_iHsd-41mMjNDymacJBLa-D2WSd1sg6G2JWscuAmXCamIpV/exec';
+
+                            try {
+                                const scriptResponse = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                                    method: 'POST',
+                                    mode: 'no-cors',
+                                    cache: 'no-cache',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        customerName: registeredUserName,
+                                        customerEmail: registeredUserEmail,
+                                        customerId: currentUserUid,
+                                        orders: ordersToProcess.map(order => ({
+                                            ...order,
+                                            status: 'Submitted',
+                                            paymentReference: paymentReference
+                                        }))
+                                    })
+                                });
+                                console.log('Order details sent to Google Apps Script. Response (if any, will be opaque due to no-cors):', scriptResponse);
+                            } catch (error) {
+                                console.error('Error sending order details to Google Apps Script:', error);
+                                displayMessage('Order logging failed. Please contact support.', 'error');
+                            }
+                        })();
+                    },
+                    onClose: function(){
+                        displayMessage('Payment process cancelled by user.', 'info');
+                    }
+                });
+                handler.openIframe();
+            }
+
+            mtnOrderForm.addEventListener('submit', (event) => handleOrderSubmission(event, 'MTN'));
+            atOrderForm.addEventListener('submit', (event) => handleOrderSubmission(event, 'AirtelTigo'));
+            telecelOrderForm.addEventListener('submit', (event) => handleOrderSubmission(event, 'Telecel'));
+
+
+            // --- Retailer Dashboard Navigation ---
+            // Event listener for the new "Dashboard" button
+            dashboardMainBtn.addEventListener('click', () => switchRetailerDashboardView('retailer-stats'));
+            mtnOrderPlacementBtn.addEventListener('click', () => switchRetailerDashboardView('mtn-order-placement'));
+            atOrderPlacementBtn.addEventListener('click', () => switchRetailerDashboardView('at-order-placement'));
+            telecelOrderPlacementBtn.addEventListener('click', () => switchRetailerDashboardView('telecel-order-placement'));
+            afaBundleRetailerBtn.addEventListener('click', () => switchRetailerDashboardView('afa-bundle-retailer')); // New AFA Bundle Button Listener
+            accountSettingsBtn.addEventListener('click', () => switchRetailerDashboardView('account-settings'));
+
+            function switchRetailerDashboardView(view, pushState = true) {
+                // Store the current view in localStorage
+                localStorage.setItem('lastRetailerView', view);
+                
+                // Update browser history if pushState is true
+                if (pushState) {
+                    history.pushState({ view: view }, '', `#${view}`);
+                }
+
+                // Hide all sections
+                retailerStatsSection.classList.add('hidden');
+                mtnOrderPlacementSection.classList.add('hidden');
+                atOrderPlacementSection.classList.add('hidden');
+                telecelOrderPlacementSection.classList.add('hidden');
+                afaBundleRetailerSection.classList.add('hidden'); // Hide new AFA section
+                accountSettingsSection.classList.add('hidden');
+                accountMessageBox.classList.add('hidden');
+                afaRetailerMessageBox.classList.add('hidden');
+
+                // Remove active class from all buttons
+                dashboardMainBtn.classList.remove('active');
+                mtnOrderPlacementBtn.classList.remove('active');
+                atOrderPlacementBtn.classList.remove('active');
+                telecelOrderPlacementBtn.classList.remove('active');
+                afaBundleRetailerBtn.classList.remove('active'); // Remove active from AFA button
+                accountSettingsBtn.classList.remove('active');
+
+                // Close all AFA accordions when switching views
+                closeAllAfaAccordions();
+
+                if (view === 'retailer-stats') {
+                    retailerStatsSection.classList.remove('hidden');
+                    dashboardMainBtn.classList.add('active');
+                    updateRetailerStats(); // Refresh stats
+                    ordersList.classList.add('hidden'); // Hide orders list by default
+                    toggleOrdersDisplayButton.textContent = 'Order History'; // Reset button text
+                } else if (view === 'mtn-order-placement') {
+                    mtnOrderPlacementSection.classList.remove('hidden');
+                    mtnOrderPlacementBtn.classList.add('active');
+                    // Reset order form and add initial item when switching to this view
+                    mtnOrderItemsContainer.innerHTML = '';
+                    addOrderItem(mtnOrderItemsContainer, 'MTN');
+                    updateTotalAmount(mtnOrderItemsContainer, 'MTN');
+                    messageBox.classList.add('hidden');
+                } else if (view === 'at-order-placement') {
+                    atOrderPlacementSection.classList.remove('hidden');
+                    atOrderPlacementBtn.classList.add('active');
+                    atOrderItemsContainer.innerHTML = '';
+                    addOrderItem(atOrderItemsContainer, 'AirtelTigo');
+                    updateTotalAmount(atOrderItemsContainer, 'AirtelTigo');
+                    messageBox.classList.add('hidden');
+                } else if (view === 'telecel-order-placement') {
+                    telecelOrderPlacementSection.classList.remove('hidden');
+                    telecelOrderPlacementBtn.classList.add('active');
+                    telecelOrderItemsContainer.innerHTML = '';
+                    addOrderItem(telecelOrderItemsContainer, 'Telecel');
+                    updateTotalAmount(telecelOrderItemsContainer, 'Telecel');
+                    messageBox.classList.add('hidden');
+                }
+                else if (view === 'afa-bundle-retailer') { // Handle new AFA bundle view
+                    afaBundleRetailerSection.classList.remove('hidden');
+                    afaBundleRetailerBtn.classList.add('active');
+                    afaRegistrationRetailerForm.reset(); // Clear form on view switch
+                    afaRetailerMessageBox.classList.add('hidden'); // Ensure message box is hidden
+                }
+                else if (view === 'account-settings') {
+                    accountSettingsSection.classList.remove('hidden');
+                    accountSettingsBtn.classList.add('active');
+                    populateAccountSettings();
+                }
+                currentView = view;
+            }
+
+            // Listen for browser's back/forward button events
+            window.addEventListener('popstate', (event) => {
+                if (event.state && event.state.view) {
+                    switchRetailerDashboardView(event.state.view, false); // Don't push state again
+                } else {
+                    // If no specific state, default to retailer-stats or initial page
+                    switchRetailerDashboardView(localStorage.getItem('lastRetailerView') || 'retailer-stats', false);
+                }
+            });
+
+            // --- AFA Call Bundle Registration Form Submission (Retailer) ---
+            afaRegistrationRetailerForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                if (!currentUserUid) {
+                    displayAfaRetailerMessage('You must be signed in to register for AFA Bundle.', 'error');
+                    showAuthForms();
+                    return;
+                }
+
+                const fullName = document.getElementById('afa-retailer-full-name').value.trim();
+                const ghanaCard = document.getElementById('afa-retailer-ghana-card').value.trim();
+                const phoneNumber = afaRetailerPhoneNumberInput.value.trim(); // Get the new phone number
+                const dob = document.getElementById('afa-retailer-dob').value.trim();
+                const location = document.getElementById('afa-retailer-location').value.trim();
+                const occupation = document.getElementById('afa-retailer-occupation').value.trim();
+
+                if (!fullName || !ghanaCard || !phoneNumber || !dob || !location || !occupation) {
+                    displayAfaRetailerMessage('Please fill in all required fields.', 'error');
+                    return;
+                }
+
+                displayAfaRetailerMessage('Initiating AFA bundle registration payment...', 'info');
+
+                const AFA_BUNDLE_PRICE = 10.00; // Fixed price for AFA bundle
+                const handler = PaystackPop.setup({
+                    key: 'pk_live_8e753f43f8defed950965395fc04f5dc7ab1035b', // Your actual public key
+                    email: registeredUserEmail,
+                    amount: AFA_BUNDLE_PRICE * 100, // Amount in kobo/pesewas
+                    currency: 'GHS',
+                    ref: 'AFA_' + Date.now(), // Unique reference for AFA bundle
+                    firstname: registeredUserName.split(' ')[0] || '',
+                    lastname: registeredUserName.split(' ').slice(1).join(' ') || '',
+                    metadata: {
+                        custom_fields: [
+                            { display_name: "Customer ID", variable_name: "customer_id", value: currentUserUid },
+                            { display_name: "Service Type", variable_name: "service_type", value: "AFA Call Bundle" },
+                            { display_name: "Full Name", variable_name: "full_name", value: fullName },
+                            { display_name: "Ghana Card", variable_name: "ghana_card", value: ghanaCard },
+                            { display_name: "Phone Number", variable_name: "phone_number", value: phoneNumber }, // Include phone number
+                            { display_name: "Date of Birth", variable_name: "date_of_birth", value: dob },
+                            { display_name: "Location", variable_name: "location", value: location },
+                            { display_name: "Occupation", variable_name: "occupation", value: occupation }
+                        ]
+                    },
+                    callback: function(response) {
+                        (async () => {
+                            const paymentReference = response.reference;
+                            console.log('Paystack Payment Successful for AFA Bundle! Reference:', paymentReference);
+
+                            // 1. Update local storage with new AFA order
+                            const newAfaOrder = {
+                                id: 'AFA' + Date.now() + '-' + Math.floor(Math.random() * 1000), // Unique ID
+                                type: 'afa_bundle', // Explicitly set type for AFA orders
+                                serviceType: 'AFA Call Bundle',
+                                price: AFA_BUNDLE_PRICE,
+                                paymentReference: paymentReference,
+                                date: new Date().toLocaleString(),
+                                status: 'Submitted', // Changed from 'Registered' to 'Submitted'
+                                details: { fullName, phoneNumber, ghanaCard, dob, location, occupation } // Include phone number
+                            };
+                            currentOrders.push(newAfaOrder);
+                            localStorage.setItem(`userOrders_${currentUserUid}`, JSON.stringify(currentOrders));
+
+                            // Update retailer specific stats for AFA bundle
+                            if (!retailerClients.has(fullName)) { // Assuming full name as unique identifier for AFA clients
+                                retailerClients.add(fullName);
+                            }
+                            retailerTotalSales += AFA_BUNDLE_PRICE;
+                            localStorage.setItem(`retailerClients_${currentUserUid}`, JSON.stringify(Array.from(retailerClients)));
+                            localStorage.setItem(`retailerTotalSales_${currentUserUid}`, retailerTotalSales.toFixed(2));
+
+
+                            // 2. Switch to Retailer Stats view and automatically show orders
+                            switchRetailerDashboardView('retailer-stats');
+                            ordersList.classList.remove('hidden'); // Show orders list
+                            toggleOrdersDisplayButton.textContent = 'Hide Order History'; // Update button text
+                            // 3. Display a success message
+                            displayMessage('AFA Call Bundle registration successful! Your request has been confirmed.', 'success');
+
+
+                            // 4. Reset form (can happen in background as user is on 'My Orders')
+                            afaRegistrationRetailerForm.reset();
+
+                            // 5. Send data to Google Apps Script (same URL, but with different payload structure)
+                            const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5CR9JLoePMdRHIApsx_iHsd-41mMjNDymacJBLa-D2WSd1sg6G2JWscuAmXCamIpV/exec';
+
+                            try {
+                                const scriptResponse = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                                    method: 'POST',
+                                    mode: 'no-cors',
+                                    cache: 'no-cache',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        customerName: registeredUserName,
+                                        customerEmail: registeredUserEmail,
+                                        customerId: currentUserUid,
+                                        afaRegistration: newAfaOrder // Send the whole AFA order object
+                                    })
+                                });
+                                console.log('AFA registration details sent to Google Apps Script:', scriptResponse);
+                            } catch (error) {
+                                console.error('Error sending AFA registration details to Google Apps Script:', error);
+                                displayMessage('AFA registration successful, but failed to log details. Please contact support.', 'error');
+                            }
+                        })();
+                    },
+                    onClose: function() {
+                        displayAfaRetailerMessage('AFA Call Bundle registration cancelled.', 'info');
+                    }
+                });
+                handler.openIframe();
+            });
+
+
+            // --- Retailer Stats Update Logic ---
+            function updateRetailerStats() {
+                totalOrdersSpan.textContent = currentOrders.length; // Total orders (includes delivered)
+                totalClientsSpan.textContent = retailerClients.size; // Number of unique clients
+                totalSalesSpan.textContent = `GHS ${retailerTotalSales.toFixed(2)}`; // Total sales amount
+                renderOrders(); // Re-render the orders list below the stats
+            }
+
+
+            function renderOrders() {
+                ordersList.innerHTML = '';
+                const ordersToDisplay = currentOrders.slice().sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by newest first
+
+                if (ordersToDisplay.length === 0) {
+                    noOrdersMessage.classList.remove('hidden');
+                    toggleOrdersDisplayButton.classList.add('hidden');
+                } else {
+                    noOrdersMessage.classList.add('hidden');
+                    toggleOrdersDisplayButton.classList.remove('hidden');
+                    ordersToDisplay.forEach(order => {
+                        const orderItem = document.createElement('div');
+                        orderItem.classList.add('shadow-sm', 'border-gray-200');
+                        let statusClass = '';
+                        let displayStatus = order.status;
+
+                        if (order.status === 'Submitted') {
+                            statusClass = 'status-submitted';
+                        } else if (order.status === 'Processing') {
+                            statusClass = 'status-processing';
+                        } else if (order.status === 'Cancelled') {
+                            statusClass = 'status-cancelled';
+                        } else if (order.status === 'Delivered') {
+                            statusClass = 'status-delivered';
+                        }
+                        else {
+                            statusClass = 'status-unknown';
+                        }
+
+                        let orderContent = '';
+                        if (order.type === 'data') {
+                            orderContent = `
+                                <p><strong>Service Type:</strong> Data Bundle</p>
+                                <p><strong>Network:</strong> ${order.network}</p>
+                                <p><strong>Bundle:</strong> ${order.bundle}</p>
+                                <p><strong>Price:</strong> GHS ${order.price.toFixed(2)}</p>
+                                <p><strong>Phone:</strong> ${order.phone}</p>
+                                ${order.server && order.server !== 'N/A' ? `<p><strong>Server:</strong> ${order.server === 'serverA' ? 'Server A (Normal)' : 'Server B (Faster)'}</p>` : ''}
+                            `;
+                        } else if (order.type === 'afa_bundle' && order.details) {
+                            orderContent = `
+                                <p><strong>Service Type:</strong> AFA Call Bundle</p>
+                                <p><strong>Registration Fee:</strong> GHS ${order.price.toFixed(2)}</p>
+                                <p><strong>Full Name:</strong> ${order.details.fullName}</p>
+                                <p><strong>Ghana Card:</strong> ${order.details.ghanaCard}</p>
+                                <p><strong>Phone Number:</strong> ${order.details.phoneNumber}</p> <!-- Display phone number -->
+                                <p><strong>Date of Birth:</strong> ${order.details.dob}</p>
+                                <p><strong>Location:</strong> ${order.details.location}</p>
+                                <p><strong>Occupation:</strong> ${order.details.occupation}</p>
+                            `;
+                        }
+
+                        orderItem.innerHTML = `
+                            <p><strong>Order ID:</strong> ${order.id}</p>
+                            ${orderContent}
+                            <p><strong>Reference:</strong> ${order.paymentReference || 'N/A'}</p>
+                            <p><strong>Date:</strong> ${order.date}</p>
+                            <p><strong>Status:</strong> <span class="${statusClass}">${displayStatus}</span></p>
+                            `;
+                        ordersList.appendChild(orderItem);
+                    });
+                }
+            }
+
+            toggleOrdersDisplayButton.addEventListener('click', () => {
+                ordersList.classList.toggle('hidden');
+                if (ordersList.classList.contains('hidden')) {
+                    toggleOrdersDisplayButton.textContent = 'Order History';
+                } else {
+                    toggleOrdersDisplayButton.textContent = 'Hide Order History';
+                }
+            });
+
+
+            // --- Account Settings Logic ---
+            function populateAccountSettings() {
+                if (currentUserUid) {
+                    profileNameInput.value = registeredUserName;
+                    profileEmailInput.value = registeredUserEmail;
+                    profilePhoneInput.value = registeredUserPhone;
+                } else {
+                    profileNameInput.value = '';
+                    profileEmailInput.value = '';
+                    profilePhoneInput.value = '';
+                }
+                currentPasswordInput.value = '';
+                newPasswordInput.value = '';
+                confirmNewPasswordInput.value = '';
+                accountMessageBox.classList.add('hidden');
+            }
+
+            profileEditForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                displayAccountMessage('Updating profile...', 'info');
+
+                const newName = profileNameInput.value.trim();
+                const newEmail = profileEmailInput.value.trim();
+                const newPhone = profilePhoneInput.value.trim();
+
+                if (!newName || !newEmail || !newPhone) {
+                    displayAccountMessage('All profile fields are required.', 'error');
+                    return;
+                }
+                
+                try {
+                    const user = auth.currentUser;
+                    if (user) {
+                        await user.updateProfile({ displayName: newName });
+                        if (user.email !== newEmail) {
+                            await user.updateEmail(newEmail);
+                        }
+                        registeredUserName = newName;
+                        registeredUserEmail = newEmail;
+                        registeredUserPhone = newPhone;
+                        userDisplay.textContent = `Welcome, ${registeredUserName}!`;
+                        displayAccountMessage('Profile updated successfully!', 'success');
+                    } else {
+                        displayAccountMessage('No user is signed in to update profile.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Profile update error:', error);
+                    displayAccountMessage(`Failed to update profile: ${error.message}`, 'error');
+                }
+            });
+
+            passwordChangeForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                displayAccountMessage('Changing password...', 'info');
+
+                const currentPassword = currentPasswordInput.value;
+                const newPassword = newPasswordInput.value;
+                const confirmNewPassword = confirmNewNewPassword.value;
+
+                if (!currentPassword || !newPassword || !confirmNewPassword) {
+                    displayAccountMessage('All password fields are required.', 'error');
+                    return;
+                }
+
+                if (newPassword.length < 6) {
+                    displayAccountMessage('New password must be at least 6 characters long.', 'error');
+                    return;
+                }
+
+                if (newPassword !== confirmNewPassword) {
+                    displayAccountMessage('New password and confirm password do not match.', 'error');
+                    return;
+                }
+                
+                try {
+                    const user = auth.currentUser;
+                    if (user) {
+                        const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
+                        await user.reauthenticateWithCredential(credential);
+                        await user.updatePassword(newPassword);
+                        displayAccountMessage('Password changed successfully!', 'success');
+                        currentPasswordInput.value = '';
+                        newPasswordInput.value = '';
+                        confirmNewPasswordInput.value = '';
+                    } else {
+                        displayAccountMessage('No user is signed in.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Password change error:', error);
+                    displayAccountMessage(`Failed to change password: ${error.message}`, 'error');
+                }
+            });
+
+
+            // --- Mobile Menu Toggle ---
+            mobileMenuButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                mobileMenu.classList.toggle('open');
+                agentMessageContainer.classList.remove('show');
+            });
+
+            // --- Mobile Menu Links Functionality ---
+            mobileDashboardLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                switchRetailerDashboardView('retailer-stats');
+                mobileMenu.classList.remove('open');
+            });
+            mobileMtnDataLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                switchRetailerDashboardView('mtn-order-placement');
+                mobileMenu.classList.remove('open');
+            });
+            mobileAtDataLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                switchRetailerDashboardView('at-order-placement');
+                mobileMenu.classList.remove('open');
+            });
+            mobileTelecelDataLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                switchRetailerDashboardView('telecel-order-placement');
+                mobileMenu.classList.remove('open');
+            });
+            mobileAfaBundleRetailerLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                switchRetailerDashboardView('afa-bundle-retailer');
+                mobileMenu.classList.remove('open');
+            });
+            mobileAccountSettingsLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                switchRetailerDashboardView('account-settings');
+                mobileMenu.classList.remove('open');
+            });
+            mobileContactLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                window.open('https://wa.me/233531323296', '_blank');
+                agentMessageContainer.classList.remove('show');
+                mobileMenu.classList.remove('open');
+            });
+
+
+            // Global click handler to close menus/info boxes
+            document.addEventListener('click', (event) => {
+                const isClickInsideAgent = agentMessageContainer.contains(event.target) || mobileContactLink.contains(event.target);
+                const isClickInsideMobileMenuButton = mobileMenuButton.contains(event.target);
+                const isClickInsideMobileMenu = mobileMenu.contains(event.target);
+                const isClickInsideAfaSection = afaBundleRetailerSection.contains(event.target);
+
+                if (!isClickInsideAgent && agentMessageContainer.classList.contains('show')) {
+                    agentMessageContainer.classList.remove('show');
+                }
+                if (!isClickInsideMobileMenuButton && !isClickInsideMobileMenu && mobileMenu.classList.contains('open')) {
+                    mobileMenu.classList.remove('open');
+                }
+
+                // Close AFA accordions if clicking outside the AFA section
+                if (!isClickInsideAfaSection) {
+                    closeAllAfaAccordions();
+                }
+            });
+
+            // Adjust mobile menu display on window resize
+            window.addEventListener('resize', () => {
+                if (mobileMenu.classList.contains('open') && window.innerWidth >= 768) {
+                    mobileMenu.classList.remove('open');
+                }
+                agentMessageContainer.classList.remove('show');
+            });
+            
+            // --- Password Toggle Functionality ---
+            function setupPasswordToggle(passwordInputId, toggleButtonId) {
+                const passwordInput = document.getElementById(passwordInputId);
+                const toggleButton = document.getElementById(toggleButtonId);
+
+                if (passwordInput && toggleButton) {
+                    toggleButton.addEventListener('click', () => {
+                        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                        passwordInput.setAttribute('type', type);
+                        // Toggle the eye icon
+                        toggleButton.querySelector('i').classList.toggle('fa-eye');
+                        toggleButton.querySelector('i').classList.toggle('fa-eye-slash');
+                        // Update aria-label for accessibility
+                        toggleButton.setAttribute('aria-label', type === 'password' ? 'Show password' : 'Hide password');
+                    });
+                }
+            }
+
+            // Apply password toggle to all relevant fields
+            setupPasswordToggle('signin-password', 'toggle-signin-password');
+            setupPasswordToggle('signup-password', 'toggle-signup-password');
+            setupPasswordToggle('signup-confirm-password', 'toggle-signup-confirm-password');
+
+            // Main FAQ Accordion Logic
+            mainFaqToggleButton.addEventListener('click', () => {
+                mainFaqContent.classList.toggle('open');
+                mainFaqToggleButton.classList.toggle('active');
+
+                if (mainFaqContent.classList.contains('open')) {
+                    mainFaqContent.style.maxHeight = mainFaqContent.scrollHeight + "px";
+                } else {
+                    mainFaqContent.style.maxHeight = "0";
+                }
+            });
+
+
+            // Individual FAQ Accordion Logic
+            const faqQuestions = document.querySelectorAll('.faq-question');
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', () => {
+                    const answer = question.nextElementSibling;
+                    question.classList.toggle('active');
+                    answer.classList.toggle('open');
+
+                    if (answer.classList.contains('open')) {
+                        answer.style.maxHeight = answer.scrollHeight + "px";
+                    } else {
+                        answer.style.maxHeight = "0";
+                    }
+                });
+            });
+
+            // --- AFA Accordion Logic ---
+            function toggleAfaAccordion(toggleButton, contentElement) {
+                const isOpen = contentElement.classList.contains('open');
+
+                // Close all other AFA accordions first
+                closeAllAfaAccordions(toggleButton);
+
+                if (!isOpen) {
+                    contentElement.classList.add('open');
+                    toggleButton.classList.add('active');
+                    contentElement.style.maxHeight = contentElement.scrollHeight + "px";
+                } else {
+                    contentElement.classList.remove('open');
+                    toggleButton.classList.remove('active');
+                    contentElement.style.maxHeight = "0";
+                }
+            }
+
+            function closeAllAfaAccordions(excludeButton = null) {
+                const allAfaToggles = document.querySelectorAll('.afa-accordion-toggle');
+                allAfaToggles.forEach(toggle => {
+                    if (toggle !== excludeButton) {
+                        const content = toggle.nextElementSibling;
+                        if (content && content.classList.contains('open')) {
+                            content.classList.remove('open');
+                            toggle.classList.remove('active');
+                            content.style.maxHeight = "0";
+                        }
+                    }
+                });
+            }
+
+            afaPurchaseToggle.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent global click from immediately closing
+                toggleAfaAccordion(afaPurchaseToggle, afaPurchaseContent);
+            });
+
+            afaBenefitsToggle.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent global click from immediately closing
+                toggleAfaAccordion(afaBenefitsToggle, afaBenefitsContent);
+            });
+        });
+    </script>
+</body>
+</html>
