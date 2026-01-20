@@ -1331,37 +1331,37 @@
         document.addEventListener('DOMContentLoaded', () => {
             // MTN Prices with Server A and Server B options (Server A reactivated)
             const mtnRawPrices = {
-                "1GB": { "serverA": 5.00, "serverB": 5.20 },
-                "2GB": { "serverA": 9.00, "serverB": 11.50 },
-                "3GB": { "serverA": 14.00, "serverB": 15.50 },
-                "4GB": { "serverA": 19.50, "serverB": 22.00 },
-                "5GB": { "serverA": 23.50, "serverB": 25.50 },
-                "6GB": { "serverA": 28.00, "serverB": 33.00 },
-                "7GB": { "serverA": 35.00, "serverB": null },
+                "1GB": { "serverA": 4.60, "serverB": 5.30 },
+                "2GB": { "serverA": 9.50, "serverB": 11.00 },
+                "3GB": { "serverA": 13.50, "serverB": 15.30 },
+                "4GB": { "serverA": 18.00, "serverB": 22.00 },
+                "5GB": { "serverA": 22.20, "serverB": 25.40 },
+                "6GB": { "serverA": 27.00, "serverB": 33.00 },
+                "7GB": { "serverA": null, "serverB": null },
                 "8GB": { "serverA": 36.00, "serverB": 40.50 },
-                "10GB": { "serverA": 44.50, "serverB": 47.00 },
-                "15GB": { "serverA": 66.00, "serverB": 70.00 },
-                "20GB": { "serverA": 88.00, "serverB": 95.00 },
+                "10GB": { "serverA": 43.0, "serverB": 47.00 },
+                "15GB": { "serverA": 63.00, "serverB": 70.00 },
+                "20GB": { "serverA": 83.00, "serverB": 95.00 },
                 "24GB": { "serverA": null, "serverB": 115.00 },
-                "30GB": { "serverA": 126.50, "serverB": 135.00 },
+                "30GB": { "serverA": 122.00, "serverB": 135.00 },
                 "50GB": { "serverA": 210.00, "serverB": null }
             };
 
             // AirtelTigo Prices (single server)
             const atRawPrices = {
-                "1GB": 5.00, "2GB": 10.00, "3GB": 15.00, "4GB": 19.00,
-                "5GB": 24.00, "6GB": 29.00, "8GB": 38.00, "10GB": 46.00,
-                "15GB": 70.00, "20GB": 90.00, "25GB": 102.00, "30GB": 120.00,
-                "40GB": 150.00, "50GB": 180.00, "200GB": 425.00
+                "1GB": 4.80, "2GB": 9.00, "3GB": 13.00, "4GB": 17.00,
+                "5GB": 22.00, "6GB": 26.50, "8GB": 34.00, "10GB": 43.00,
+                "15GB": 63.00, "20GB": 86.00, "25GB": null, "30GB": 90.00,
+                "40GB": 110.00, "50GB": 127.00, "200GB": 400.00
             };
 
             // Telecel Prices (single server)
             const telecelRawPrices = {
-                "5GB": 27.00,
-                "10GB": 54.00,
-                "15GB": 72.00,
-                "20GB": 102.00, "25GB": 125.00, "30GB": 150.00,
-                "35GB": 180.00, "40GB": 200.00, "45GB": 225.00
+                "5GB": 24.00,
+                "10GB": 47.00,
+                "15GB": 65.00,
+                "20GB": 85.00, "25GB": 103.00, "30GB": 120.00,
+                "35GB": null, "40GB": 163.00, "45GB": 200.00
             };
 
             // Helper to convert raw prices to bundle objects for a specific server (MTN only)
